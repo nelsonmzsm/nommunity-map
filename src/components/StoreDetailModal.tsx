@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import type { Store } from "@/types/store";
 import IslandBadge from "./IslandBadge";
 
@@ -123,6 +124,19 @@ export default function StoreDetailModal({
                   予約する
                 </a>
               )}
+            </div>
+
+            <div className="mt-5 rounded-lg border border-zinc-200 bg-zinc-50 p-3 text-xs leading-relaxed text-zinc-500">
+              <p>
+                お店の情報は最新のものでない可能性があります。予約などのお問い合わせは、現在も営業中かどうかご確認をお願いいたします。
+              </p>
+              <p className="mt-1.5">
+                本サイトに掲載されている情報は、基本的に口コミで収集したものですが、間違いを発見した場合は
+                <Link href="/submit" className="font-semibold text-zinc-600 underline-offset-2 hover:underline">
+                  管理者まで
+                </Link>
+                お伝えいただけると助かります。
+              </p>
             </div>
           </div>
         </div>
