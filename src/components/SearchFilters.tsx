@@ -58,14 +58,6 @@ export default function SearchFilters({
 
   return (
     <div className="bg-tsumugi flex flex-col gap-3 border-b border-zinc-200 p-3">
-      <input
-        type="text"
-        value={filters.keyword}
-        onChange={(e) => onChange({ ...filters, keyword: e.target.value })}
-        placeholder="店名・住所・キーワードで検索"
-        className="w-full rounded-lg border border-zinc-300 px-4 py-3 text-base focus:border-zinc-500 focus:outline-none"
-      />
-
       <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
         {regions.map((region) => {
           const active = filters.regionIds.includes(region.id);
@@ -74,7 +66,7 @@ export default function SearchFilters({
               key={region.id}
               type="button"
               onClick={() => toggleRegion(region.id)}
-              className="shrink-0 whitespace-nowrap rounded-full px-2 py-1 text-xs font-semibold transition-opacity sm:px-4 sm:py-2 sm:text-base"
+              className="order-2 shrink-0 whitespace-nowrap rounded-full px-2 py-1 text-xs font-semibold transition-opacity sm:order-none sm:px-4 sm:py-2 sm:text-base"
               style={{
                 backgroundColor: active ? region.color : region.colorSoft,
                 color: active ? "#ffffff" : region.textColor,
@@ -86,9 +78,15 @@ export default function SearchFilters({
           );
         })}
 
-        <div className="ml-auto hidden shrink-0 sm:block">
-          {prefectureSelect}
-        </div>
+        <input
+          type="text"
+          value={filters.keyword}
+          onChange={(e) => onChange({ ...filters, keyword: e.target.value })}
+          placeholder="店名・住所・キーワードで検索"
+          className="order-1 w-full rounded-lg border border-zinc-300 px-4 py-3 text-base focus:border-zinc-500 focus:outline-none sm:order-3 sm:w-56 sm:flex-none sm:py-2"
+        />
+
+        <div className="order-4 hidden shrink-0 sm:block">{prefectureSelect}</div>
       </div>
 
       <div className="flex rounded-full border border-zinc-300 bg-zinc-50 p-1 sm:hidden">

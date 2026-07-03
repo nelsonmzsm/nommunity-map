@@ -37,7 +37,10 @@ export default async function SubmissionDetailPage({
         </div>
         <div>
           <dt className="text-xs text-zinc-400">ジャンル</dt>
-          <dd>{submission.genre?.name || "-"}</dd>
+          <dd>
+            {submission.genre?.name || "-"}
+            {submission.genre_other_text && `（${submission.genre_other_text}）`}
+          </dd>
         </div>
         <div>
           <dt className="text-xs text-zinc-400">島</dt>
@@ -50,17 +53,26 @@ export default async function SubmissionDetailPage({
           </dd>
         </div>
         <div>
-          <dt className="text-xs text-zinc-400">紹介文</dt>
+          <dt className="text-xs text-zinc-400">お店関係者の出身集落・町</dt>
+          <dd>{submission.village || "-"}</dd>
+        </div>
+        <div>
+          <dt className="text-xs text-zinc-400">おすすめのコメント</dt>
           <dd className="whitespace-pre-wrap">{submission.profile || "-"}</dd>
         </div>
         <div>
-          <dt className="text-xs text-zinc-400">写真URL</dt>
+          <dt className="text-xs text-zinc-400">写真</dt>
           <dd className="whitespace-pre-wrap">{submission.photos.join("\n") || "-"}</dd>
         </div>
         <div>
-          <dt className="text-xs text-zinc-400">情報提供者</dt>
+          <dt className="text-xs text-zinc-400">登録者（投稿者）の情報</dt>
           <dd>
             {submission.submitter_display_name}
+            {submission.submitter_relation && (
+              <span className="ml-1 text-xs text-zinc-500">
+                （{submission.submitter_relation === "self" ? "自薦・お店関係者" : "他薦・常連客など"}）
+              </span>
+            )}
             {submission.submitter_contact && `（連絡先: ${submission.submitter_contact}）`}
           </dd>
         </div>

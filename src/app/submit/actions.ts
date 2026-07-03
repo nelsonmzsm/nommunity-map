@@ -2,18 +2,22 @@
 
 import { z } from "zod";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { isDriveConfigured, uploadPhotoToDrive } from "@/lib/google-drive";
 
 const submissionSchema = z.object({
   kind: z.enum(["new", "correction"]),
+  submitterRelation: z.enum(["self", "other"], {
+    message: "投稿者とお店の関係を選択してください",
+  }),
   targetStoreId: z.string().optional(),
   name: z.string().optional(),
   genreId: z.string().optional(),
+  genreOtherText: z.string().optional(),
   regionId: z.string().optional(),
   prefecture: z.string().optional(),
   town: z.string().optional(),
   village: z.string().optional(),
   address: z.string().optional(),
-  photos: z.string().optional(),
   profile: z.string().optional(),
   storeUrl: z.string().optional(),
   phone: z.string().optional(),
@@ -32,7 +36,9 @@ export async function submitStore(
   _prevState: SubmitState,
   formData: FormData
 ): Promise<SubmitState> {
-  const raw = Object.fromEntries(formData.entries());
+  const raw = Object.fromEntries(
+    Array.from(formData.entries()).filter(([, value]) => typeof value === "string")
+  );
   const parsed = submissionSchema.safeParse(raw);
 
   if (!parsed.success) {
@@ -49,18 +55,36 @@ export async function submitStore(
     return { status: "success" };
   }
 
-  const photos = (data.photos ?? "")
-    .split("\n")
-    .map((url) => url.trim())
-    .filter(Boolean);
+  const photoFiles = formData
+    .getAll("photos")
+    .filter((entry): entry is File => entry instanceof File && entry.size > 0);
+
+  let photos: string[] = [];
+  if (photoFiles.length > 0) {
+    if (isDriveConfigured()) {
+      try {
+        photos = await Promise.all(photoFiles.map((file) => uploadPhotoToDrive(file)));
+      } catch (err) {
+        console.error("Google Drive upload failed:", err);
+        return {
+          status: "error",
+          message: "写真のアップロードに失敗しました。時間をおいて再度お試しください。",
+        };
+      }
+    } else {
+      console.warn("Google Drive is not configured; skipping photo upload.");
+    }
+  }
 
   const supabase = createAdminClient();
   const { error } = await supabase.from("store_submissions").insert({
     target_store_id: data.kind === "correction" ? data.targetStoreId || null : null,
     submitter_display_name: data.submitterDisplayName,
     submitter_contact: data.submitterContact || null,
+    submitter_relation: data.submitterRelation,
     name: data.name || null,
     genre_id: data.genreId || null,
+    genre_other_text: data.genreOtherText || null,
     region_id: data.regionId || null,
     prefecture: data.prefecture || null,
     town: data.town || null,

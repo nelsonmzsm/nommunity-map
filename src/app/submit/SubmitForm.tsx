@@ -15,10 +15,16 @@ interface SubmitFormProps {
 }
 
 const INITIAL_STATE: SubmitState = { status: "idle" };
+const OTHER_GENRE_NAME = "その他の飲食店";
 
 export default function SubmitForm({ genres, regions, stores }: SubmitFormProps) {
   const [state, formAction, pending] = useActionState(submitStore, INITIAL_STATE);
   const [kind, setKind] = useState<"new" | "correction">("new");
+  const [genreId, setGenreId] = useState("");
+  const [photoFileNames, setPhotoFileNames] = useState<string[]>([]);
+
+  const otherGenre = genres.find((g) => g.name === OTHER_GENRE_NAME);
+  const isOtherGenre = otherGenre != null && genreId === otherGenre.id;
 
   if (state.status === "success") {
     return (
@@ -30,6 +36,20 @@ export default function SubmitForm({ genres, regions, stores }: SubmitFormProps)
 
   return (
     <form action={formAction} className="mt-6 flex flex-col gap-4">
+      <label className="flex flex-col gap-1 text-sm">
+        投稿者とお店の関係
+        <div className="flex gap-4">
+          <label className="flex items-center gap-1.5">
+            <input type="radio" name="submitterRelation" value="self" required />
+            自薦（お店関係者です）
+          </label>
+          <label className="flex items-center gap-1.5">
+            <input type="radio" name="submitterRelation" value="other" required />
+            他薦（お客さん・常連さんなど）
+          </label>
+        </div>
+      </label>
+
       <div className="flex gap-4 text-sm">
         <label className="flex items-center gap-1.5">
           <input
@@ -76,7 +96,12 @@ export default function SubmitForm({ genres, regions, stores }: SubmitFormProps)
 
       <label className="flex flex-col gap-1 text-sm">
         ジャンル
-        <select name="genreId" className="rounded-lg border border-zinc-300 px-3 py-2">
+        <select
+          name="genreId"
+          value={genreId}
+          onChange={(e) => setGenreId(e.target.value)}
+          className="rounded-lg border border-zinc-300 px-3 py-2"
+        >
           <option value="">選択してください</option>
           {genres.map((genre) => (
             <option key={genre.id} value={genre.id}>
@@ -85,6 +110,18 @@ export default function SubmitForm({ genres, regions, stores }: SubmitFormProps)
           ))}
         </select>
       </label>
+
+      {isOtherGenre && (
+        <label className="flex flex-col gap-1 text-sm">
+          ジャンル（自由記入）
+          <input
+            name="genreOtherText"
+            type="text"
+            placeholder="例: ラーメン店"
+            className="rounded-lg border border-zinc-300 px-3 py-2"
+          />
+        </label>
+      )}
 
       <label className="flex flex-col gap-1 text-sm">
         ゆかりの島
@@ -110,22 +147,32 @@ export default function SubmitForm({ genres, regions, stores }: SubmitFormProps)
       </div>
 
       <label className="flex flex-col gap-1 text-sm">
-        出身集落・町（例: 笠利町出身）
-        <input name="village" type="text" className="rounded-lg border border-zinc-300 px-3 py-2" />
-      </label>
-
-      <label className="flex flex-col gap-1 text-sm">
-        住所
+        以降の住所（市区町村より後ろ。例: 歌舞伎町1-2-3）
         <input name="address" type="text" className="rounded-lg border border-zinc-300 px-3 py-2" />
       </label>
 
       <label className="flex flex-col gap-1 text-sm">
-        写真URL（1行に1つ）
-        <textarea name="photos" rows={3} className="rounded-lg border border-zinc-300 px-3 py-2" />
+        お店関係者の出身集落・町（例: 笠利町出身）
+        <input name="village" type="text" className="rounded-lg border border-zinc-300 px-3 py-2" />
       </label>
 
       <label className="flex flex-col gap-1 text-sm">
-        紹介文
+        写真（複数選択できます）
+        <input
+          name="photos"
+          type="file"
+          accept="image/*"
+          multiple
+          onChange={(e) => setPhotoFileNames(Array.from(e.target.files ?? []).map((f) => f.name))}
+          className="rounded-lg border border-zinc-300 px-3 py-2 text-sm file:mr-3 file:rounded-md file:border-0 file:bg-zinc-100 file:px-3 file:py-1.5"
+        />
+        {photoFileNames.length > 0 && (
+          <span className="text-xs text-zinc-500">{photoFileNames.join(" / ")}</span>
+        )}
+      </label>
+
+      <label className="flex flex-col gap-1 text-sm">
+        おすすめのコメント（このお店の好きなところなど自由にどうぞ）
         <textarea name="profile" rows={4} className="rounded-lg border border-zinc-300 px-3 py-2" />
       </label>
 
@@ -140,6 +187,8 @@ export default function SubmitForm({ genres, regions, stores }: SubmitFormProps)
       </label>
 
       <hr className="my-2 border-zinc-200" />
+
+      <h2 className="text-sm font-bold text-zinc-900">登録者（あなた）の情報</h2>
 
       <label className="flex flex-col gap-1 text-sm">
         お名前（必須。「情報提供: 〇〇さん」として公開されます）
