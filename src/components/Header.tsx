@@ -2,7 +2,7 @@ export default function Header({ onOpenSubmit }: { onOpenSubmit: () => void }) {
   return (
     <header className="bg-tsumugi flex flex-col gap-3 border-b border-zinc-200 px-4 py-3 sm:flex-row sm:items-start sm:justify-between">
       <div className="min-w-0">
-        <h1 className="text-xl font-bold text-zinc-900 sm:text-3xl md:text-4xl">
+        <h1 className="text-2xl font-bold text-zinc-900 sm:text-3xl md:text-4xl">
           奄美群島飲ミュニティマップ
         </h1>
         <p className="mt-2 text-xs text-zinc-500 sm:text-sm">
@@ -14,7 +14,7 @@ export default function Header({ onOpenSubmit }: { onOpenSubmit: () => void }) {
         <button
           type="button"
           onClick={onOpenSubmit}
-          className="whitespace-nowrap rounded-full bg-zinc-900 px-5 py-2.5 text-base font-bold text-white hover:bg-zinc-700"
+          className="whitespace-nowrap rounded-full bg-zinc-900 px-3 py-1.5 text-sm font-bold text-white hover:bg-zinc-700 sm:px-5 sm:py-2.5 sm:text-base"
         >
           お店の情報を教える
         </button>
