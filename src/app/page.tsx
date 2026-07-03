@@ -104,13 +104,15 @@ export default function Home() {
 
   return (
     <div className="flex h-dvh flex-col">
-      <Header view={mobileView} onChangeView={setMobileView} />
+      <Header />
       <SearchFilters
         filters={{ ...filters, prefecture: effectivePrefecture }}
         genres={genres}
         regions={regions}
         prefectureOptions={prefectureOptions}
         onChange={setFilters}
+        view={mobileView}
+        onChangeView={setMobileView}
       />
 
       <div className="relative flex flex-1 overflow-hidden">
