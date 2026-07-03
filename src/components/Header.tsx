@@ -2,10 +2,10 @@ export default function Header({ onOpenSubmit }: { onOpenSubmit: () => void }) {
   return (
     <header className="bg-tsumugi flex flex-col gap-3 border-b border-zinc-200 px-4 py-3 sm:flex-row sm:items-start sm:justify-between">
       <div className="min-w-0">
-        <h1 className="text-2xl font-bold text-zinc-900 sm:text-3xl md:text-4xl">
+        <h1 className="text-3xl font-bold text-zinc-900 md:text-4xl">
           奄美群島飲ミュニティマップ
         </h1>
-        <p className="mt-2 text-xs text-zinc-500 sm:text-sm">
+        <p className="mt-2 text-lg text-zinc-500 sm:text-sm">
           飲んで、つながり、島になる。奄美群島ゆかりのお店だけを集めたサイト
         </p>
       </div>
