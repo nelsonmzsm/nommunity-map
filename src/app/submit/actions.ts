@@ -25,6 +25,22 @@ const submissionSchema = z.object({
   creditName: z.string().optional(),
   message: z.string().optional(),
   company: z.string().optional(), // ハニーポット（人間は空欄のまま送信する）
+}).superRefine((data, ctx) => {
+  // 新しいお店の投稿では、店舗として成立するための最低限の項目を必須にする。
+  // 既存店舗の修正では、直したい項目だけ埋める部分更新を許可する。
+  if (data.kind !== "new") return;
+  const required: Array<[string, string | undefined]> = [
+    ["name", "店名を入力してください"],
+    ["regionId", "ゆかりの島を選択してください"],
+    ["prefecture", "都道府県を選択してください"],
+    ["town", "市区町村を選択してください"],
+    ["address", "以降の住所を入力してください"],
+  ];
+  for (const [field, message] of required) {
+    if (!data[field as keyof typeof data]) {
+      ctx.addIssue({ code: "custom", path: [field], message });
+    }
+  }
 });
 
 export interface SubmitState {

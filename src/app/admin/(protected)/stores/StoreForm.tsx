@@ -1,3 +1,7 @@
+"use client";
+
+import { useRef, useState } from "react";
+
 interface Option {
   id: string;
   name: string;
@@ -33,6 +37,42 @@ export default function StoreForm({
   regions: Option[];
   initial?: StoreFormValues;
 }) {
+  const prefectureRef = useRef<HTMLInputElement>(null);
+  const townRef = useRef<HTMLInputElement>(null);
+  const addressRef = useRef<HTMLInputElement>(null);
+  const latRef = useRef<HTMLInputElement>(null);
+  const lngRef = useRef<HTMLInputElement>(null);
+  const [geocoding, setGeocoding] = useState(false);
+  const [geocodeError, setGeocodeError] = useState<string | null>(null);
+
+  const handleGeocode = async () => {
+    const fullAddress = `${prefectureRef.current?.value ?? ""}${townRef.current?.value ?? ""}${addressRef.current?.value ?? ""}`;
+    if (!fullAddress.trim()) {
+      setGeocodeError("先に都道府県・市区町村・住所を入力してください");
+      return;
+    }
+    setGeocoding(true);
+    setGeocodeError(null);
+    try {
+      const res = await fetch("/api/admin/geocode", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ address: fullAddress }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setGeocodeError(data.error ?? "取得に失敗しました");
+        return;
+      }
+      if (latRef.current) latRef.current.value = String(data.lat);
+      if (lngRef.current) lngRef.current.value = String(data.lng);
+    } catch {
+      setGeocodeError("通信に失敗しました");
+    } finally {
+      setGeocoding(false);
+    }
+  };
+
   return (
     <form action={action} className="flex max-w-xl flex-col gap-3">
       <label className="flex flex-col gap-1 text-sm">
@@ -84,6 +124,7 @@ export default function StoreForm({
         <label className="flex flex-col gap-1 text-sm">
           都道府県
           <input
+            ref={prefectureRef}
             name="prefecture"
             type="text"
             required
@@ -94,6 +135,7 @@ export default function StoreForm({
         <label className="flex flex-col gap-1 text-sm">
           市区町村
           <input
+            ref={townRef}
             name="town"
             type="text"
             required
@@ -117,6 +159,7 @@ export default function StoreForm({
       <label className="flex flex-col gap-1 text-sm">
         住所
         <input
+          ref={addressRef}
           name="address"
           type="text"
           required
@@ -129,6 +172,7 @@ export default function StoreForm({
         <label className="flex flex-col gap-1 text-sm">
           緯度(lat)
           <input
+            ref={latRef}
             name="lat"
             type="number"
             step="any"
@@ -140,6 +184,7 @@ export default function StoreForm({
         <label className="flex flex-col gap-1 text-sm">
           経度(lng)
           <input
+            ref={lngRef}
             name="lng"
             type="number"
             step="any"
@@ -148,6 +193,18 @@ export default function StoreForm({
             className="rounded-lg border border-zinc-300 px-3 py-2"
           />
         </label>
+      </div>
+
+      <div>
+        <button
+          type="button"
+          onClick={handleGeocode}
+          disabled={geocoding}
+          className="rounded-lg border border-zinc-300 px-3 py-1.5 text-xs font-semibold text-zinc-600 hover:bg-zinc-50 disabled:opacity-50"
+        >
+          {geocoding ? "取得中..." : "住所から緯度経度を取得"}
+        </button>
+        {geocodeError && <p className="mt-1 text-xs text-red-600">{geocodeError}</p>}
       </div>
 
       <label className="flex flex-col gap-1 text-sm">

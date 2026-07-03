@@ -1,31 +1,31 @@
 export default function Header({ onOpenSubmit }: { onOpenSubmit: () => void }) {
   return (
-    <header className="bg-tsumugi flex items-start justify-between gap-3 border-b border-zinc-200 px-4 py-3">
-      <div>
-        <h1 className="text-3xl font-bold text-zinc-900 sm:text-4xl">
+    <header className="bg-tsumugi flex flex-col gap-3 border-b border-zinc-200 px-4 py-3 sm:flex-row sm:items-start sm:justify-between">
+      <div className="min-w-0">
+        <h1 className="text-xl font-bold text-zinc-900 sm:text-3xl md:text-4xl">
           奄美群島飲ミュニティマップ
         </h1>
-        <p className="mt-2 text-sm text-zinc-500">
+        <p className="mt-2 text-xs text-zinc-500 sm:text-sm">
           飲んで、つながり、島になる。奄美群島ゆかりのお店だけを集めたサイト
         </p>
       </div>
 
-      <div className="flex shrink-0 flex-col items-end gap-1.5 text-sm">
+      <div className="flex shrink-0 flex-wrap items-center gap-3">
+        <button
+          type="button"
+          onClick={onOpenSubmit}
+          className="whitespace-nowrap rounded-full bg-zinc-900 px-5 py-2.5 text-base font-bold text-white hover:bg-zinc-700"
+        >
+          お店の情報を教える
+        </button>
         <a
           href="https://vietmaru.com/works"
           target="_blank"
           rel="noopener noreferrer"
-          className="font-semibold text-zinc-600 underline-offset-2 hover:underline"
+          className="whitespace-nowrap rounded-full border border-zinc-300 px-3 py-1.5 text-sm font-semibold text-zinc-600 hover:bg-zinc-100"
         >
           開発者について
         </a>
-        <button
-          type="button"
-          onClick={onOpenSubmit}
-          className="font-semibold text-zinc-600 underline-offset-2 hover:underline"
-        >
-          お店の情報を教える
-        </button>
       </div>
     </header>
   );

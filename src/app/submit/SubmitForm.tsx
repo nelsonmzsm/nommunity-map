@@ -108,7 +108,12 @@ export default function SubmitForm({ genres, regions, stores }: SubmitFormProps)
 
       <label className="flex flex-col gap-1 text-sm">
         店名
-        <input name="name" type="text" className="rounded-lg border border-zinc-300 bg-white px-3 py-2" />
+        <input
+          name="name"
+          type="text"
+          required={kind === "new"}
+          className="rounded-lg border border-zinc-300 bg-white px-3 py-2"
+        />
       </label>
 
       <fieldset className="flex flex-col gap-1 text-sm">
@@ -143,7 +148,11 @@ export default function SubmitForm({ genres, regions, stores }: SubmitFormProps)
 
       <label className="flex flex-col gap-1 text-sm">
         ゆかりの島
-        <select name="regionId" className="rounded-lg border border-zinc-300 bg-white px-3 py-2">
+        <select
+          name="regionId"
+          required={kind === "new"}
+          className="rounded-lg border border-zinc-300 bg-white px-3 py-2"
+        >
           <option value="">選択してください</option>
           {selectableRegions.map((region) => (
             <option key={region.id} value={region.id}>
@@ -158,6 +167,7 @@ export default function SubmitForm({ genres, regions, stores }: SubmitFormProps)
           都道府県
           <select
             name="prefecture"
+            required={kind === "new"}
             value={prefecture}
             onChange={(e) => setPrefecture(e.target.value)}
             className="rounded-lg border border-zinc-300 bg-white px-3 py-2"
@@ -174,6 +184,7 @@ export default function SubmitForm({ genres, regions, stores }: SubmitFormProps)
           市区町村
           <select
             name="town"
+            required={kind === "new"}
             disabled={!prefecture}
             className="rounded-lg border border-zinc-300 bg-white px-3 py-2 disabled:bg-zinc-100"
           >
@@ -189,7 +200,12 @@ export default function SubmitForm({ genres, regions, stores }: SubmitFormProps)
 
       <label className="flex flex-col gap-1 text-sm">
         以降の住所（市区町村より後ろ。例: 道頓堀2-4-7 2F）
-        <input name="address" type="text" className="rounded-lg border border-zinc-300 bg-white px-3 py-2" />
+        <input
+          name="address"
+          type="text"
+          required={kind === "new"}
+          className="rounded-lg border border-zinc-300 bg-white px-3 py-2"
+        />
       </label>
 
       <label className="flex flex-col gap-1 text-sm">
