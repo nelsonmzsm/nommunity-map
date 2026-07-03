@@ -76,7 +76,11 @@ export default function StoreDetailModal({
             <dl className="mt-4 space-y-2 text-base text-zinc-700">
               <div className="flex gap-2">
                 <dt className="w-20 shrink-0 text-zinc-400">住所</dt>
-                <dd>{store.address}</dd>
+                <dd>
+                  {store.prefecture}
+                  {store.town}
+                  {store.address}
+                </dd>
               </div>
               <div className="flex gap-2">
                 <dt className="w-20 shrink-0 text-zinc-400">町・集落</dt>

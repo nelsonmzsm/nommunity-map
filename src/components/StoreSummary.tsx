@@ -30,7 +30,11 @@ export default function StoreSummary({ store }: { store: Store }) {
         <p className="mt-1 truncate text-lg font-bold text-zinc-900">
           {store.name}
         </p>
-        <p className="truncate text-sm text-zinc-500">{store.address}</p>
+        <p className="truncate text-sm text-zinc-500">
+          {store.prefecture}
+          {store.town}
+          {store.address}
+        </p>
       </div>
     </div>
   );

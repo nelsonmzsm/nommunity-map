@@ -1,0 +1,3 @@
+name,genre,region,prefecture,town,village,address,lat,lng,photo_url_1,photo_url_2,photo_url_3,profile,store_url,phone,is_ad,reservation_url,provider_note
+サンプル居酒屋 うぶすな,居酒屋（郷土料理あり）,奄美大島,東京都,新宿区歌舞伎町,笠利町出身,歌舞伎町1-2-3,35.6938,139.7034,https://example.com/photo1.jpg,https://example.com/photo2.jpg,,奄美大島・笠利町出身の店主が営む島料理居酒屋。鶏飯や油ぞうめんが名物。,https://example.com/ubusuna,03-1234-5601,false,,
+サンプル島バル Kikai,バー,喜界島,東京都,豊島区池袋,湾出身,池袋2-4-5,35.7295,139.7109,,,,,黒糖焼酎を豊富に取り揃えたバー。,,,,false,,
