@@ -11,16 +11,18 @@ export default async function EditStorePage({
   const { id } = await params;
   const supabase = await createClient();
 
-  const [{ data: store }, { data: genres }, { data: regions }] = await Promise.all([
-    supabase.from("stores").select("*").eq("id", id).single(),
-    supabase.from("genres").select("id, name").eq("is_active", true).order("sort_order"),
-    supabase
-      .from("regions")
-      .select("id, name")
-      .eq("group_key", "amami")
-      .eq("is_active", true)
-      .order("sort_order"),
-  ]);
+  const [{ data: store }, { data: genres }, { data: regions }, { data: storeGenres }] =
+    await Promise.all([
+      supabase.from("stores").select("*").eq("id", id).single(),
+      supabase.from("genres").select("id, name").eq("is_active", true).order("sort_order"),
+      supabase
+        .from("regions")
+        .select("id, name")
+        .eq("group_key", "amami")
+        .eq("is_active", true)
+        .order("sort_order"),
+      supabase.from("store_genres").select("genre_id").eq("store_id", id),
+    ]);
 
   if (!store) {
     notFound();
@@ -33,7 +35,7 @@ export default async function EditStorePage({
         action={updateStore.bind(null, id)}
         genres={genres ?? []}
         regions={regions ?? []}
-        initial={store}
+        initial={{ ...store, genre_ids: (storeGenres ?? []).map((sg) => sg.genre_id) }}
       />
     </div>
   );

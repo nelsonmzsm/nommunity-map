@@ -5,7 +5,7 @@ interface Option {
 
 interface StoreFormValues {
   name?: string;
-  genre_id?: string;
+  genre_ids?: string[];
   region_id?: string;
   prefecture?: string;
   town?: string;
@@ -46,22 +46,22 @@ export default function StoreForm({
         />
       </label>
 
-      <label className="flex flex-col gap-1 text-sm">
-        ジャンル
-        <select
-          name="genreId"
-          required
-          defaultValue={initial?.genre_id}
-          className="rounded-lg border border-zinc-300 px-3 py-2"
-        >
-          <option value="">選択してください</option>
+      <fieldset className="flex flex-col gap-1 text-sm">
+        <legend>ジャンル（複数選択できます）</legend>
+        <div className="flex flex-wrap gap-x-4 gap-y-1.5">
           {genres.map((genre) => (
-            <option key={genre.id} value={genre.id}>
+            <label key={genre.id} className="flex items-center gap-1.5">
+              <input
+                type="checkbox"
+                name="genreIds"
+                value={genre.id}
+                defaultChecked={initial?.genre_ids?.includes(genre.id)}
+              />
               {genre.name}
-            </option>
+            </label>
           ))}
-        </select>
-      </label>
+        </div>
+      </fieldset>
 
       <label className="flex flex-col gap-1 text-sm">
         島

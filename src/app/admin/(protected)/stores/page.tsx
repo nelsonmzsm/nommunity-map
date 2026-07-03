@@ -6,7 +6,7 @@ export default async function AdminStoresPage() {
   const supabase = await createClient();
   const { data: stores } = await supabase
     .from("stores")
-    .select("*, genre:genres(name), region:regions(name)")
+    .select("*, store_genres(genre:genres(name)), region:regions(name)")
     .order("created_at", { ascending: false });
 
   return (
@@ -35,7 +35,7 @@ export default async function AdminStoresPage() {
           {(stores ?? []).map((store) => (
             <tr key={store.id} className="border-b border-zinc-100">
               <td className="py-2 font-semibold">{store.name}</td>
-              <td>{store.genre?.name}</td>
+              <td>{store.store_genres.map((sg) => sg.genre?.name).join("・")}</td>
               <td>{store.region?.name}</td>
               <td>{store.status === "published" ? "公開中" : "非公開"}</td>
               <td className="space-x-3 text-right">

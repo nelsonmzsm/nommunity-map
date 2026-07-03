@@ -12,13 +12,18 @@ export default async function SubmissionDetailPage({
 
   const { data: submission } = await supabase
     .from("store_submissions")
-    .select("*, genre:genres(name), region:regions(name), target_store:stores(name)")
+    .select("*, region:regions(name), target_store:stores(name)")
     .eq("id", id)
     .single();
 
   if (!submission) {
     notFound();
   }
+
+  const { data: submissionGenres } =
+    submission.genre_ids.length > 0
+      ? await supabase.from("genres").select("name").in("id", submission.genre_ids)
+      : { data: [] };
 
   return (
     <div className="flex max-w-xl flex-col gap-4">
@@ -38,7 +43,7 @@ export default async function SubmissionDetailPage({
         <div>
           <dt className="text-xs text-zinc-400">ジャンル</dt>
           <dd>
-            {submission.genre?.name || "-"}
+            {(submissionGenres ?? []).map((g) => g.name).join("・") || "-"}
             {submission.genre_other_text && `（${submission.genre_other_text}）`}
           </dd>
         </div>

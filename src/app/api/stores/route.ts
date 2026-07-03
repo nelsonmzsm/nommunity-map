@@ -6,7 +6,7 @@ export async function GET() {
   const supabase = await createClient();
   const { data, error } = await supabase
     .from("stores")
-    .select("*, genre:genres(*), region:regions(*)")
+    .select("*, store_genres(genre:genres(*)), region:regions(*)")
     .eq("status", "published");
 
   if (error) {
@@ -16,7 +16,7 @@ export async function GET() {
   const stores: Store[] = data.map((s) => ({
     id: s.id,
     name: s.name,
-    genre: { id: s.genre.id, name: s.genre.name },
+    genres: s.store_genres.map((sg) => ({ id: sg.genre.id, name: sg.genre.name })),
     region: {
       id: s.region.id,
       key: s.region.key,

@@ -16,7 +16,7 @@ export interface Genre {
 export interface Store {
   id: string;
   name: string;
-  genre: Genre;
+  genres: Genre[];
   region: Region;
   prefecture: string;
   town: string;

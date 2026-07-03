@@ -25,7 +25,9 @@ export default function StoreSummary({ store }: { store: Store }) {
       <div className="min-w-0 flex-1">
         <div className="flex flex-wrap items-center gap-2">
           <IslandBadge region={store.region} />
-          <span className="text-sm text-zinc-500">{store.genre.name}</span>
+          <span className="text-sm text-zinc-500">
+            {store.genres.map((g) => g.name).join("・")}
+          </span>
         </div>
         <p className="mt-1 truncate text-lg font-bold text-zinc-900">
           {store.name}

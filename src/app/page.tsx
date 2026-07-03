@@ -64,13 +64,14 @@ export default function Home() {
       }
       if (
         filters.genreIds.length > 0 &&
-        !filters.genreIds.includes(store.genre.id)
+        !store.genres.some((genre) => filters.genreIds.includes(genre.id))
       ) {
         return false;
       }
       if (keyword) {
+        const genreNames = store.genres.map((g) => g.name).join(" ");
         const haystack =
-          `${store.name} ${store.address} ${store.town} ${store.village} ${store.genre.name}`.toLowerCase();
+          `${store.name} ${store.address} ${store.town} ${store.village} ${genreNames}`.toLowerCase();
         if (!haystack.includes(keyword)) return false;
       }
       return true;

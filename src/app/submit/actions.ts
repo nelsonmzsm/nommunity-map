@@ -11,7 +11,6 @@ const submissionSchema = z.object({
   }),
   targetStoreId: z.string().optional(),
   name: z.string().optional(),
-  genreId: z.string().optional(),
   genreOtherText: z.string().optional(),
   regionId: z.string().optional(),
   prefecture: z.string().optional(),
@@ -55,6 +54,10 @@ export async function submitStore(
     return { status: "success" };
   }
 
+  const genreIds = formData
+    .getAll("genreIds")
+    .filter((v): v is string => typeof v === "string" && v.length > 0);
+
   const photoFiles = formData
     .getAll("photos")
     .filter((entry): entry is File => entry instanceof File && entry.size > 0);
@@ -83,7 +86,7 @@ export async function submitStore(
     submitter_contact: data.submitterContact || null,
     submitter_relation: data.submitterRelation,
     name: data.name || null,
-    genre_id: data.genreId || null,
+    genre_ids: genreIds,
     genre_other_text: data.genreOtherText || null,
     region_id: data.regionId || null,
     prefecture: data.prefecture || null,

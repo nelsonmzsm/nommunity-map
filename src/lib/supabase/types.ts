@@ -28,7 +28,6 @@ type GenreRow = {
 type StoreRow = {
   id: string;
   name: string;
-  genre_id: string;
   region_id: string;
   prefecture: string;
   town: string;
@@ -48,6 +47,11 @@ type StoreRow = {
   updated_at: string;
 };
 
+type StoreGenreRow = {
+  store_id: string;
+  genre_id: string;
+};
+
 type StoreSubmissionRow = {
   id: string;
   target_store_id: string | null;
@@ -55,7 +59,7 @@ type StoreSubmissionRow = {
   submitter_display_name: string;
   submitter_contact: string | null;
   name: string | null;
-  genre_id: string | null;
+  genre_ids: string[];
   region_id: string | null;
   prefecture: string | null;
   town: string | null;
@@ -97,17 +101,31 @@ export type Database = {
         Update: Partial<StoreRow>;
         Relationships: [
           {
-            foreignKeyName: "stores_genre_id_fkey";
-            columns: ["genre_id"];
-            isOneToOne: false;
-            referencedRelation: "genres";
-            referencedColumns: ["id"];
-          },
-          {
             foreignKeyName: "stores_region_id_fkey";
             columns: ["region_id"];
             isOneToOne: false;
             referencedRelation: "regions";
+            referencedColumns: ["id"];
+          }
+        ];
+      };
+      store_genres: {
+        Row: StoreGenreRow;
+        Insert: Partial<StoreGenreRow>;
+        Update: Partial<StoreGenreRow>;
+        Relationships: [
+          {
+            foreignKeyName: "store_genres_store_id_fkey";
+            columns: ["store_id"];
+            isOneToOne: false;
+            referencedRelation: "stores";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "store_genres_genre_id_fkey";
+            columns: ["genre_id"];
+            isOneToOne: false;
+            referencedRelation: "genres";
             referencedColumns: ["id"];
           }
         ];
@@ -122,13 +140,6 @@ export type Database = {
             columns: ["target_store_id"];
             isOneToOne: false;
             referencedRelation: "stores";
-            referencedColumns: ["id"];
-          },
-          {
-            foreignKeyName: "store_submissions_genre_id_fkey";
-            columns: ["genre_id"];
-            isOneToOne: false;
-            referencedRelation: "genres";
             referencedColumns: ["id"];
           },
           {

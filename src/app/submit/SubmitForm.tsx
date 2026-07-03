@@ -20,11 +20,17 @@ const OTHER_GENRE_NAME = "その他の飲食店";
 export default function SubmitForm({ genres, regions, stores }: SubmitFormProps) {
   const [state, formAction, pending] = useActionState(submitStore, INITIAL_STATE);
   const [kind, setKind] = useState<"new" | "correction">("new");
-  const [genreId, setGenreId] = useState("");
+  const [genreIds, setGenreIds] = useState<string[]>([]);
   const [photoFileNames, setPhotoFileNames] = useState<string[]>([]);
 
   const otherGenre = genres.find((g) => g.name === OTHER_GENRE_NAME);
-  const isOtherGenre = otherGenre != null && genreId === otherGenre.id;
+  const isOtherGenre = otherGenre != null && genreIds.includes(otherGenre.id);
+
+  const toggleGenre = (id: string) => {
+    setGenreIds((prev) =>
+      prev.includes(id) ? prev.filter((g) => g !== id) : [...prev, id]
+    );
+  };
 
   if (state.status === "success") {
     return (
@@ -94,22 +100,23 @@ export default function SubmitForm({ genres, regions, stores }: SubmitFormProps)
         <input name="name" type="text" className="rounded-lg border border-zinc-300 px-3 py-2" />
       </label>
 
-      <label className="flex flex-col gap-1 text-sm">
-        ジャンル
-        <select
-          name="genreId"
-          value={genreId}
-          onChange={(e) => setGenreId(e.target.value)}
-          className="rounded-lg border border-zinc-300 px-3 py-2"
-        >
-          <option value="">選択してください</option>
+      <fieldset className="flex flex-col gap-1 text-sm">
+        <legend>ジャンル（複数選択できます）</legend>
+        <div className="flex flex-wrap gap-x-4 gap-y-1.5">
           {genres.map((genre) => (
-            <option key={genre.id} value={genre.id}>
+            <label key={genre.id} className="flex items-center gap-1.5">
+              <input
+                type="checkbox"
+                name="genreIds"
+                value={genre.id}
+                checked={genreIds.includes(genre.id)}
+                onChange={() => toggleGenre(genre.id)}
+              />
               {genre.name}
-            </option>
+            </label>
           ))}
-        </select>
-      </label>
+        </div>
+      </fieldset>
 
       {isOtherGenre && (
         <label className="flex flex-col gap-1 text-sm">

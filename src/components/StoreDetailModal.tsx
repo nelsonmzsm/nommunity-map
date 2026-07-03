@@ -71,7 +71,9 @@ export default function StoreDetailModal({
 
           <div className="px-4 pb-4">
             <h2 className="text-2xl font-bold text-zinc-900">{store.name}</h2>
-            <p className="mt-1 text-base text-zinc-500">{store.genre.name}</p>
+            <p className="mt-1 text-base text-zinc-500">
+              {store.genres.map((g) => g.name).join("・")}
+            </p>
 
             <dl className="mt-4 space-y-2 text-base text-zinc-700">
               <div className="flex gap-2">

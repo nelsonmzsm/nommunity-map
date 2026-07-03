@@ -13,7 +13,6 @@ function storeFieldsFromForm(formData: FormData) {
 
   return {
     name: String(formData.get("name") ?? ""),
-    genre_id: String(formData.get("genreId") ?? ""),
     region_id: String(formData.get("regionId") ?? ""),
     prefecture: String(formData.get("prefecture") ?? ""),
     town: String(formData.get("town") ?? ""),
@@ -31,10 +30,34 @@ function storeFieldsFromForm(formData: FormData) {
   };
 }
 
+function genreIdsFromForm(formData: FormData) {
+  return formData
+    .getAll("genreIds")
+    .filter((v): v is string => typeof v === "string" && v.length > 0);
+}
+
+async function syncStoreGenres(storeId: string, genreIds: string[]) {
+  const supabase = createAdminClient();
+  await supabase.from("store_genres").delete().eq("store_id", storeId);
+  if (genreIds.length > 0) {
+    await supabase
+      .from("store_genres")
+      .insert(genreIds.map((genre_id) => ({ store_id: storeId, genre_id })));
+  }
+}
+
 export async function createStore(formData: FormData) {
   await requireAdmin();
   const supabase = createAdminClient();
-  await supabase.from("stores").insert(storeFieldsFromForm(formData));
+  const { data, error } = await supabase
+    .from("stores")
+    .insert(storeFieldsFromForm(formData))
+    .select("id")
+    .single();
+  if (error || !data) {
+    throw new Error(error?.message ?? "店舗の作成に失敗しました");
+  }
+  await syncStoreGenres(data.id, genreIdsFromForm(formData));
   revalidatePath("/admin/stores");
   redirect("/admin/stores");
 }
@@ -46,6 +69,7 @@ export async function updateStore(id: string, formData: FormData) {
     .from("stores")
     .update({ ...storeFieldsFromForm(formData), updated_at: new Date().toISOString() })
     .eq("id", id);
+  await syncStoreGenres(id, genreIdsFromForm(formData));
   revalidatePath("/admin/stores");
   redirect("/admin/stores");
 }
