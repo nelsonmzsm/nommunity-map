@@ -188,10 +188,10 @@ export default function StoreDetailModal({
 
             <div className="mt-5 rounded-lg border border-zinc-200 bg-zinc-50 p-3 text-xs leading-relaxed text-zinc-500">
               <p>
-                お店の情報は最新のものでない可能性があります。予約などのお問い合わせは、現在も営業中かどうかご確認をお願いいたします。
+                お店の情報は最新でない可能性があります。ご利用の前に、現在も営業中かご確認ください。
               </p>
               <p className="mt-1.5">
-                本サイトに掲載されている情報は、基本的に口コミで収集したものです。間違いを見つけた場合は
+                本サイトの掲載情報は、原則的にお寄せいただいた口コミを元にしています。もし間違いを見つけられた場合は
                 <button
                   type="button"
                   onClick={onOpenSubmit}
