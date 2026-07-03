@@ -44,7 +44,7 @@ export default function SearchFilters({
         className="w-full rounded-lg border border-zinc-300 px-4 py-3 text-base focus:border-zinc-500 focus:outline-none"
       />
 
-      <div className="flex flex-wrap gap-2">
+      <div className="scrollbar-none flex flex-nowrap gap-2 overflow-x-auto">
         {regions.map((region) => {
           const active = filters.regionIds.includes(region.id);
           return (
@@ -52,7 +52,7 @@ export default function SearchFilters({
               key={region.id}
               type="button"
               onClick={() => toggleRegion(region.id)}
-              className="rounded-full px-4 py-2 text-base font-semibold transition-opacity"
+              className="shrink-0 rounded-full px-4 py-2 text-base font-semibold transition-opacity"
               style={{
                 backgroundColor: active ? region.color : region.colorSoft,
                 color: active ? "#ffffff" : region.textColor,
@@ -63,20 +63,20 @@ export default function SearchFilters({
             </button>
           );
         })}
-
-        <select
-          value={filters.prefecture}
-          onChange={(e) => onChange({ ...filters, prefecture: e.target.value })}
-          className="rounded-full border border-zinc-300 bg-white px-4 py-2 text-base font-semibold text-zinc-700"
-        >
-          <option value="">都道府県: すべて</option>
-          {prefectureOptions.map(({ prefecture, count }) => (
-            <option key={prefecture} value={prefecture}>
-              {prefecture}（{count}）
-            </option>
-          ))}
-        </select>
       </div>
+
+      <select
+        value={filters.prefecture}
+        onChange={(e) => onChange({ ...filters, prefecture: e.target.value })}
+        className="self-start rounded-full border border-zinc-300 bg-white px-4 py-2 text-base font-semibold text-zinc-700"
+      >
+        <option value="">都道府県: すべて</option>
+        {prefectureOptions.map(({ prefecture, count }) => (
+          <option key={prefecture} value={prefecture}>
+            {prefecture}（{count}）
+          </option>
+        ))}
+      </select>
 
       <div className="flex flex-wrap gap-2">
         {genres.map((genre) => {

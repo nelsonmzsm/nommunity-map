@@ -135,7 +135,7 @@ export default function Home() {
         </div>
 
         <div
-          className={`h-full w-full shrink-0 border-zinc-200 sm:block sm:w-96 sm:border-l ${
+          className={`h-full w-full shrink-0 border-zinc-200 sm:block sm:w-1/2 sm:border-l lg:w-96 ${
             mobileView === "list" ? "block" : "hidden"
           }`}
         >

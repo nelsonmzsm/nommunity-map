@@ -10,10 +10,10 @@ export default function Header({ view, onChangeView }: HeaderProps) {
     <header className="bg-tsumugi flex items-center justify-between gap-3 border-b border-zinc-200 px-4 py-3">
       <div>
         <h1 className="text-xl font-bold text-zinc-900 sm:text-2xl">
-          アマミ飲ミュニティマップ
+          奄美群島飲ミュニティマップ
         </h1>
         <p className="text-sm text-zinc-500">
-          奄美群島ゆかりの居酒屋を探そう
+          飲んでつながる。奄美群島ゆかりのお店だけを集めたサイト
         </p>
       </div>
 
