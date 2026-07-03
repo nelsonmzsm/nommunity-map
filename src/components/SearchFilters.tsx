@@ -66,10 +66,12 @@ export default function SearchFilters({
               key={region.id}
               type="button"
               onClick={() => toggleRegion(region.id)}
-              className="order-2 shrink-0 whitespace-nowrap rounded-full px-2 py-1 text-xs font-semibold transition-opacity sm:order-none sm:px-4 sm:py-2 sm:text-base"
+              className={`order-2 shrink-0 whitespace-nowrap rounded-full px-2 py-1 text-xs font-semibold transition-shadow sm:order-none sm:px-4 sm:py-2 sm:text-base ${
+                active ? "ring-2 ring-zinc-900 ring-offset-1" : ""
+              }`}
               style={{
-                backgroundColor: active ? region.color : region.colorSoft,
-                color: active ? "#ffffff" : region.textColor,
+                backgroundColor: active ? region.colorBorder : region.color,
+                color: "#ffffff",
                 border: `1.5px solid ${region.colorBorder}`,
               }}
             >
