@@ -83,3 +83,13 @@ export async function toggleStoreStatus(id: string, status: "published" | "hidde
     .eq("id", id);
   revalidatePath("/admin/stores");
 }
+
+export async function deleteStore(id: string) {
+  await requireAdmin();
+  const supabase = createAdminClient();
+  const { error } = await supabase.from("stores").delete().eq("id", id);
+  if (error) {
+    throw new Error(error.message);
+  }
+  revalidatePath("/admin/stores");
+}

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { toggleStoreStatus } from "./actions";
+import { toggleStoreStatus, deleteStore } from "./actions";
+import DeleteStoreButton from "./DeleteStoreButton";
 
 export default async function AdminStoresPage() {
   const supabase = createAdminClient();
@@ -53,6 +54,10 @@ export default async function AdminStoresPage() {
                     {store.status === "published" ? "非公開にする" : "公開する"}
                   </button>
                 </form>
+                <DeleteStoreButton
+                  action={deleteStore.bind(null, store.id)}
+                  storeName={store.name}
+                />
               </td>
             </tr>
           ))}
