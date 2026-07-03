@@ -5,8 +5,8 @@ export default function Header({ onOpenSubmit }: { onOpenSubmit: () => void }) {
         <h1 className="text-3xl font-bold text-zinc-900 sm:text-4xl">
           奄美群島飲ミュニティマップ
         </h1>
-        <p className="text-sm text-zinc-500">
-          飲んだらつながる。奄美群島ゆかりのお店だけを集めたサイト
+        <p className="mt-2 text-sm text-zinc-500">
+          飲んで、つながり、島になる。奄美群島ゆかりのお店だけを集めたサイト
         </p>
       </div>
 
