@@ -74,6 +74,7 @@ type StoreSubmissionRow = {
   message: string | null;
   submitter_relation: "self" | "other" | null;
   genre_other_text: string | null;
+  credit_name: boolean;
   created_at: string;
   reviewed_at: string | null;
   reviewed_by: string | null;

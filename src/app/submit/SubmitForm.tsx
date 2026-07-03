@@ -95,7 +95,7 @@ export default function SubmitForm({ genres, regions, stores }: SubmitFormProps)
           対象の店舗
           <select
             name="targetStoreId"
-            className="rounded-lg border border-zinc-300 px-3 py-2"
+            className="rounded-lg border border-zinc-300 bg-white px-3 py-2"
           >
             {stores.map((store) => (
               <option key={store.id} value={store.id}>
@@ -108,7 +108,7 @@ export default function SubmitForm({ genres, regions, stores }: SubmitFormProps)
 
       <label className="flex flex-col gap-1 text-sm">
         店名
-        <input name="name" type="text" className="rounded-lg border border-zinc-300 px-3 py-2" />
+        <input name="name" type="text" className="rounded-lg border border-zinc-300 bg-white px-3 py-2" />
       </label>
 
       <fieldset className="flex flex-col gap-1 text-sm">
@@ -136,14 +136,14 @@ export default function SubmitForm({ genres, regions, stores }: SubmitFormProps)
             name="genreOtherText"
             type="text"
             placeholder="例: ラーメン店"
-            className="rounded-lg border border-zinc-300 px-3 py-2"
+            className="rounded-lg border border-zinc-300 bg-white px-3 py-2"
           />
         </label>
       )}
 
       <label className="flex flex-col gap-1 text-sm">
         ゆかりの島
-        <select name="regionId" className="rounded-lg border border-zinc-300 px-3 py-2">
+        <select name="regionId" className="rounded-lg border border-zinc-300 bg-white px-3 py-2">
           <option value="">選択してください</option>
           {selectableRegions.map((region) => (
             <option key={region.id} value={region.id}>
@@ -160,7 +160,7 @@ export default function SubmitForm({ genres, regions, stores }: SubmitFormProps)
             name="prefecture"
             value={prefecture}
             onChange={(e) => setPrefecture(e.target.value)}
-            className="rounded-lg border border-zinc-300 px-3 py-2"
+            className="rounded-lg border border-zinc-300 bg-white px-3 py-2"
           >
             <option value="">選択してください</option>
             {PREFECTURES.map((p) => (
@@ -175,7 +175,7 @@ export default function SubmitForm({ genres, regions, stores }: SubmitFormProps)
           <select
             name="town"
             disabled={!prefecture}
-            className="rounded-lg border border-zinc-300 px-3 py-2 disabled:bg-zinc-100"
+            className="rounded-lg border border-zinc-300 bg-white px-3 py-2 disabled:bg-zinc-100"
           >
             <option value="">{prefecture ? "選択してください" : "都道府県を先に選択"}</option>
             {cities.map((city) => (
@@ -189,12 +189,12 @@ export default function SubmitForm({ genres, regions, stores }: SubmitFormProps)
 
       <label className="flex flex-col gap-1 text-sm">
         以降の住所（市区町村より後ろ。例: 道頓堀2-4-7 2F）
-        <input name="address" type="text" className="rounded-lg border border-zinc-300 px-3 py-2" />
+        <input name="address" type="text" className="rounded-lg border border-zinc-300 bg-white px-3 py-2" />
       </label>
 
       <label className="flex flex-col gap-1 text-sm">
         お店とゆかりのある集落（例: 和泊町国頭）
-        <input name="village" type="text" className="rounded-lg border border-zinc-300 px-3 py-2" />
+        <input name="village" type="text" className="rounded-lg border border-zinc-300 bg-white px-3 py-2" />
       </label>
 
       <label className="flex flex-col gap-1 text-sm">
@@ -205,7 +205,7 @@ export default function SubmitForm({ genres, regions, stores }: SubmitFormProps)
           accept="image/*"
           multiple
           onChange={(e) => setPhotoFiles(Array.from(e.target.files ?? []))}
-          className="rounded-lg border border-zinc-300 px-3 py-2 text-sm file:mr-3 file:rounded-md file:border-0 file:bg-zinc-100 file:px-3 file:py-1.5"
+          className="rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm file:mr-3 file:rounded-md file:border-0 file:bg-zinc-100 file:px-3 file:py-1.5"
         />
         {photoFiles.length > 0 && (
           <span className="text-xs text-zinc-500">
@@ -221,17 +221,17 @@ export default function SubmitForm({ genres, regions, stores }: SubmitFormProps)
 
       <label className="flex flex-col gap-1 text-sm">
         おすすめのコメント（このお店の好きなところなど自由にどうぞ）
-        <textarea name="profile" rows={4} className="rounded-lg border border-zinc-300 px-3 py-2" />
+        <textarea name="profile" rows={4} className="rounded-lg border border-zinc-300 bg-white px-3 py-2" />
       </label>
 
       <label className="flex flex-col gap-1 text-sm">
         お店のページURL
-        <input name="storeUrl" type="text" className="rounded-lg border border-zinc-300 px-3 py-2" />
+        <input name="storeUrl" type="text" className="rounded-lg border border-zinc-300 bg-white px-3 py-2" />
       </label>
 
       <label className="flex flex-col gap-1 text-sm">
         電話番号
-        <input name="phone" type="text" className="rounded-lg border border-zinc-300 px-3 py-2" />
+        <input name="phone" type="text" className="rounded-lg border border-zinc-300 bg-white px-3 py-2" />
       </label>
 
       <p className="text-xs text-zinc-500">
@@ -246,23 +246,29 @@ export default function SubmitForm({ genres, regions, stores }: SubmitFormProps)
       </div>
 
       <label className="flex flex-col gap-1 text-sm">
-        お名前（必須・ニックネーム可。「情報提供: 〇〇さん」として公開されます）
+        お名前（必須・ニックネーム可）
         <input
           name="submitterDisplayName"
           type="text"
           required
-          className="rounded-lg border border-zinc-300 px-3 py-2"
+          className="rounded-lg border border-zinc-300 bg-white px-3 py-2"
         />
+      </label>
+
+      <label className="flex items-start gap-2 text-sm">
+        <input type="checkbox" name="creditName" value="yes" className="mt-1" />
+        あなたの名前を情報提供者の一人として追加してもいいですか？（チェックすると「情報提供:
+        〇〇さん」として店舗ページに公開されます）
       </label>
 
       <label className="flex flex-col gap-1 text-sm">
         連絡先（任意。運営からの確認用で公開されません）
-        <input name="submitterContact" type="text" className="rounded-lg border border-zinc-300 px-3 py-2" />
+        <input name="submitterContact" type="text" className="rounded-lg border border-zinc-300 bg-white px-3 py-2" />
       </label>
 
       <label className="flex flex-col gap-1 text-sm">
         運営へのメッセージ（任意）
-        <textarea name="message" rows={2} className="rounded-lg border border-zinc-300 px-3 py-2" />
+        <textarea name="message" rows={2} className="rounded-lg border border-zinc-300 bg-white px-3 py-2" />
       </label>
 
       <input

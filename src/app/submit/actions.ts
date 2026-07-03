@@ -22,6 +22,7 @@ const submissionSchema = z.object({
   phone: z.string().optional(),
   submitterDisplayName: z.string().min(1, "お名前を入力してください"),
   submitterContact: z.string().optional(),
+  creditName: z.string().optional(),
   message: z.string().optional(),
   company: z.string().optional(), // ハニーポット（人間は空欄のまま送信する）
 });
@@ -95,6 +96,7 @@ export async function submitStore(
     target_store_id: data.kind === "correction" ? data.targetStoreId || null : null,
     submitter_display_name: data.submitterDisplayName,
     submitter_contact: data.submitterContact || null,
+    credit_name: data.creditName === "yes",
     submitter_relation: data.submitterRelation,
     name: data.name || null,
     genre_ids: genreIds,

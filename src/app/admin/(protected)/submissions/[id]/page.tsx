@@ -79,6 +79,9 @@ export default async function SubmissionDetailPage({
               </span>
             )}
             {submission.submitter_contact && `（連絡先: ${submission.submitter_contact}）`}
+            <span className="ml-1 text-xs text-zinc-500">
+              （名前の公開: {submission.credit_name ? "同意あり" : "同意なし"}）
+            </span>
           </dd>
         </div>
         {submission.message && (
