@@ -37,11 +37,11 @@ export default function StoreDetailModal({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-end justify-center bg-black/40 sm:items-center sm:p-4"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4"
       onClick={onClose}
     >
       <div
-        className="bg-tsumugi flex max-h-[92vh] w-full max-w-lg flex-col overflow-hidden rounded-t-2xl sm:rounded-2xl"
+        className="bg-tsumugi flex max-h-[92vh] w-full max-w-lg flex-col overflow-hidden rounded-2xl"
         onClick={(e) => e.stopPropagation()}
       >
         <div
