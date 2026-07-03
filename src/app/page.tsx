@@ -6,6 +6,7 @@ import SearchFilters from "@/components/SearchFilters";
 import MapView from "@/components/MapView";
 import StoreList from "@/components/StoreList";
 import StoreDetailModal from "@/components/StoreDetailModal";
+import SubmitModal from "@/components/SubmitModal";
 import type { Genre, Region, Store, StoreFilters } from "@/types/store";
 
 const INITIAL_FILTERS: StoreFilters = {
@@ -24,6 +25,12 @@ export default function Home() {
   const [mobileView, setMobileView] = useState<"map" | "list">("map");
   const [selectedStoreId, setSelectedStoreId] = useState<string | null>(null);
   const [detailStore, setDetailStore] = useState<Store | null>(null);
+  const [submitOpen, setSubmitOpen] = useState(false);
+
+  const openDetail = (store: Store) => {
+    setSelectedStoreId(store.id);
+    setDetailStore(store);
+  };
 
   useEffect(() => {
     let cancelled = false;
@@ -105,7 +112,7 @@ export default function Home() {
 
   return (
     <div className="flex h-dvh flex-col">
-      <Header />
+      <Header onOpenSubmit={() => setSubmitOpen(true)} />
       <SearchFilters
         filters={{ ...filters, prefecture: effectivePrefecture }}
         genres={genres}
@@ -132,7 +139,7 @@ export default function Home() {
               selectedStoreId={selectedStoreId}
               prefecture={effectivePrefecture}
               onSelectStore={setSelectedStoreId}
-              onOpenDetail={setDetailStore}
+              onOpenDetail={openDetail}
             />
           )}
         </div>
@@ -146,7 +153,7 @@ export default function Home() {
             stores={filteredStores}
             selectedStoreId={selectedStoreId}
             onSelectStore={(store) => setSelectedStoreId(store.id)}
-            onOpenDetail={setDetailStore}
+            onOpenDetail={openDetail}
           />
         </div>
       </div>
@@ -154,9 +161,17 @@ export default function Home() {
       {detailStore && (
         <StoreDetailModal
           store={detailStore}
+          stores={filteredStores}
           onClose={() => setDetailStore(null)}
+          onNavigate={openDetail}
+          onOpenSubmit={() => {
+            setDetailStore(null);
+            setSubmitOpen(true);
+          }}
         />
       )}
+
+      {submitOpen && <SubmitModal onClose={() => setSubmitOpen(false)} />}
     </div>
   );
 }

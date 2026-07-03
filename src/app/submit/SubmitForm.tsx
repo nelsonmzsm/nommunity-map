@@ -2,6 +2,7 @@
 
 import { useActionState, useState } from "react";
 import { submitStore, type SubmitState } from "./actions";
+import prefectureCities from "@/data/japan-prefectures-cities.json";
 
 interface Option {
   id: string;
@@ -16,15 +17,25 @@ interface SubmitFormProps {
 
 const INITIAL_STATE: SubmitState = { status: "idle" };
 const OTHER_GENRE_NAME = "その他の飲食店";
+const UNCONFIRMED_REGION_NAME = "未確認";
+const PREFECTURES = Object.keys(prefectureCities);
+const MAX_PHOTO_MB = 5;
+const MAX_PHOTO_BYTES = MAX_PHOTO_MB * 1024 * 1024;
 
 export default function SubmitForm({ genres, regions, stores }: SubmitFormProps) {
   const [state, formAction, pending] = useActionState(submitStore, INITIAL_STATE);
   const [kind, setKind] = useState<"new" | "correction">("new");
   const [genreIds, setGenreIds] = useState<string[]>([]);
-  const [photoFileNames, setPhotoFileNames] = useState<string[]>([]);
+  const [photoFiles, setPhotoFiles] = useState<File[]>([]);
+  const [prefecture, setPrefecture] = useState("");
 
+  const selectableRegions = regions.filter((r) => r.name !== UNCONFIRMED_REGION_NAME);
   const otherGenre = genres.find((g) => g.name === OTHER_GENRE_NAME);
   const isOtherGenre = otherGenre != null && genreIds.includes(otherGenre.id);
+  const cities: string[] = prefecture
+    ? (prefectureCities as Record<string, string[]>)[prefecture] ?? []
+    : [];
+  const oversizedPhotos = photoFiles.filter((f) => f.size > MAX_PHOTO_BYTES);
 
   const toggleGenre = (id: string) => {
     setGenreIds((prev) =>
@@ -134,7 +145,7 @@ export default function SubmitForm({ genres, regions, stores }: SubmitFormProps)
         ゆかりの島
         <select name="regionId" className="rounded-lg border border-zinc-300 px-3 py-2">
           <option value="">選択してください</option>
-          {regions.map((region) => (
+          {selectableRegions.map((region) => (
             <option key={region.id} value={region.id}>
               {region.name}
             </option>
@@ -145,36 +156,66 @@ export default function SubmitForm({ genres, regions, stores }: SubmitFormProps)
       <div className="grid grid-cols-2 gap-3">
         <label className="flex flex-col gap-1 text-sm">
           都道府県
-          <input name="prefecture" type="text" className="rounded-lg border border-zinc-300 px-3 py-2" />
+          <select
+            name="prefecture"
+            value={prefecture}
+            onChange={(e) => setPrefecture(e.target.value)}
+            className="rounded-lg border border-zinc-300 px-3 py-2"
+          >
+            <option value="">選択してください</option>
+            {PREFECTURES.map((p) => (
+              <option key={p} value={p}>
+                {p}
+              </option>
+            ))}
+          </select>
         </label>
         <label className="flex flex-col gap-1 text-sm">
           市区町村
-          <input name="town" type="text" className="rounded-lg border border-zinc-300 px-3 py-2" />
+          <select
+            name="town"
+            disabled={!prefecture}
+            className="rounded-lg border border-zinc-300 px-3 py-2 disabled:bg-zinc-100"
+          >
+            <option value="">{prefecture ? "選択してください" : "都道府県を先に選択"}</option>
+            {cities.map((city) => (
+              <option key={city} value={city}>
+                {city}
+              </option>
+            ))}
+          </select>
         </label>
       </div>
 
       <label className="flex flex-col gap-1 text-sm">
-        以降の住所（市区町村より後ろ。例: 歌舞伎町1-2-3）
+        以降の住所（市区町村より後ろ。例: 道頓堀2-4-7 2F）
         <input name="address" type="text" className="rounded-lg border border-zinc-300 px-3 py-2" />
       </label>
 
       <label className="flex flex-col gap-1 text-sm">
-        お店関係者の出身集落・町（例: 笠利町出身）
+        お店とゆかりのある集落（例: 和泊町国頭）
         <input name="village" type="text" className="rounded-lg border border-zinc-300 px-3 py-2" />
       </label>
 
       <label className="flex flex-col gap-1 text-sm">
-        写真（複数選択できます）
+        写真（複数選択できます。1枚あたり{MAX_PHOTO_MB}MBまで）
         <input
           name="photos"
           type="file"
           accept="image/*"
           multiple
-          onChange={(e) => setPhotoFileNames(Array.from(e.target.files ?? []).map((f) => f.name))}
+          onChange={(e) => setPhotoFiles(Array.from(e.target.files ?? []))}
           className="rounded-lg border border-zinc-300 px-3 py-2 text-sm file:mr-3 file:rounded-md file:border-0 file:bg-zinc-100 file:px-3 file:py-1.5"
         />
-        {photoFileNames.length > 0 && (
-          <span className="text-xs text-zinc-500">{photoFileNames.join(" / ")}</span>
+        {photoFiles.length > 0 && (
+          <span className="text-xs text-zinc-500">
+            {photoFiles.map((f) => f.name).join(" / ")}
+          </span>
+        )}
+        {oversizedPhotos.length > 0 && (
+          <span className="text-xs text-red-600">
+            {MAX_PHOTO_MB}MBを超えている写真があります: {oversizedPhotos.map((f) => f.name).join(" / ")}
+          </span>
         )}
       </label>
 
@@ -193,12 +234,19 @@ export default function SubmitForm({ genres, regions, stores }: SubmitFormProps)
         <input name="phone" type="text" className="rounded-lg border border-zinc-300 px-3 py-2" />
       </label>
 
+      <p className="text-xs text-zinc-500">
+        アップロードいただいた情報（画像含む）は、サイト上に掲載する可能性があります。
+      </p>
+
       <hr className="my-2 border-zinc-200" />
 
-      <h2 className="text-sm font-bold text-zinc-900">登録者（あなた）の情報</h2>
+      <div>
+        <h2 className="text-sm font-bold text-zinc-900">登録者（あなた）の情報（任意）</h2>
+        <p className="mt-0.5 text-xs text-zinc-500">情報確認のために連絡する可能性があります。</p>
+      </div>
 
       <label className="flex flex-col gap-1 text-sm">
-        お名前（必須。「情報提供: 〇〇さん」として公開されます）
+        お名前（必須・ニックネーム可。「情報提供: 〇〇さん」として公開されます）
         <input
           name="submitterDisplayName"
           type="text"

@@ -31,6 +31,9 @@ export interface SubmitState {
   message?: string;
 }
 
+const MAX_PHOTO_MB = 5;
+const MAX_PHOTO_BYTES = MAX_PHOTO_MB * 1024 * 1024;
+
 export async function submitStore(
   _prevState: SubmitState,
   formData: FormData
@@ -61,6 +64,14 @@ export async function submitStore(
   const photoFiles = formData
     .getAll("photos")
     .filter((entry): entry is File => entry instanceof File && entry.size > 0);
+
+  const oversizedPhoto = photoFiles.find((file) => file.size > MAX_PHOTO_BYTES);
+  if (oversizedPhoto) {
+    return {
+      status: "error",
+      message: `写真は1枚あたり${MAX_PHOTO_MB}MBまでです（${oversizedPhoto.name}）。`,
+    };
+  }
 
   let photos: string[] = [];
   if (photoFiles.length > 0) {

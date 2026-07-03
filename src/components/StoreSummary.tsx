@@ -1,6 +1,8 @@
 import Image from "next/image";
 import type { Store } from "@/types/store";
 import IslandBadge from "./IslandBadge";
+import GenreTag from "./GenreTag";
+import PhotoPlaceholder from "./PhotoPlaceholder";
 
 export default function StoreSummary({ store }: { store: Store }) {
   const photo = store.photos[0];
@@ -17,17 +19,15 @@ export default function StoreSummary({ store }: { store: Store }) {
             unoptimized
           />
         ) : (
-          <div className="flex h-full w-full items-center justify-center text-sm text-zinc-400">
-            No Image
-          </div>
+          <PhotoPlaceholder genres={store.genres} region={store.region} />
         )}
       </div>
       <div className="min-w-0 flex-1">
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="flex flex-wrap items-center gap-1.5">
           <IslandBadge region={store.region} />
-          <span className="text-sm text-zinc-500">
-            {store.genres.map((g) => g.name).join("・")}
-          </span>
+          {store.genres.map((g) => (
+            <GenreTag key={g.id} name={g.name} />
+          ))}
         </div>
         <p className="mt-1 truncate text-lg font-bold text-zinc-900">
           {store.name}
