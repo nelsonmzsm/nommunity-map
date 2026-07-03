@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { approveSubmission, rejectSubmission } from "../actions";
 
 export default async function SubmissionDetailPage({
@@ -8,7 +8,7 @@ export default async function SubmissionDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const supabase = await createClient();
+  const supabase = createAdminClient();
 
   const { data: submission } = await supabase
     .from("store_submissions")

@@ -1,8 +1,8 @@
-import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { addGenre, toggleGenreActive } from "./actions";
 
 export default async function AdminGenresPage() {
-  const supabase = await createClient();
+  const supabase = createAdminClient();
   const { data: genres } = await supabase
     .from("genres")
     .select("*")

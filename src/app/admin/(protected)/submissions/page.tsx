@@ -1,8 +1,8 @@
 import Link from "next/link";
-import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 
 export default async function AdminSubmissionsPage() {
-  const supabase = await createClient();
+  const supabase = createAdminClient();
   const { data: submissions } = await supabase
     .from("store_submissions")
     .select("*")

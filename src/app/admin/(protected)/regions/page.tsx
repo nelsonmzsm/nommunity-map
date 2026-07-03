@@ -1,8 +1,8 @@
-import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { addRegion, toggleRegionActive } from "./actions";
 
 export default async function AdminRegionsPage() {
-  const supabase = await createClient();
+  const supabase = createAdminClient();
   const { data: regions } = await supabase
     .from("regions")
     .select("*")

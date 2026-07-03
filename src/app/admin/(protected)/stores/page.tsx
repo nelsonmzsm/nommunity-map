@@ -1,9 +1,9 @@
 import Link from "next/link";
-import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { toggleStoreStatus } from "./actions";
 
 export default async function AdminStoresPage() {
-  const supabase = await createClient();
+  const supabase = createAdminClient();
   const { data: stores } = await supabase
     .from("stores")
     .select("*, store_genres(genre:genres(name)), region:regions(name)")

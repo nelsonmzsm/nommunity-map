@@ -1,15 +1,18 @@
 import Link from "next/link";
-import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 
 export default async function AdminDashboardPage() {
-  const supabase = await createClient();
+  const supabase = createAdminClient();
 
   const [{ count: pendingCount }, { count: storeCount }] = await Promise.all([
     supabase
       .from("store_submissions")
       .select("*", { count: "exact", head: true })
       .eq("status", "pending"),
-    supabase.from("stores").select("*", { count: "exact", head: true }),
+    supabase
+      .from("stores")
+      .select("*", { count: "exact", head: true })
+      .eq("status", "published"),
   ]);
 
   return (

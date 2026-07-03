@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import StoreForm from "../../StoreForm";
 import { updateStore } from "../../actions";
 
@@ -9,7 +9,7 @@ export default async function EditStorePage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const supabase = await createClient();
+  const supabase = createAdminClient();
 
   const [{ data: store }, { data: genres }, { data: regions }, { data: storeGenres }] =
     await Promise.all([
