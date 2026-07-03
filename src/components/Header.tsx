@@ -1,6 +1,6 @@
 export default function Header({ onOpenSubmit }: { onOpenSubmit: () => void }) {
   return (
-    <header className="bg-tsumugi flex flex-col gap-3 border-b border-zinc-200 px-4 py-3 sm:flex-row sm:items-start sm:justify-between">
+    <header className="bg-tsumugi flex flex-col gap-3 border-b border-zinc-200 px-4 py-3">
       <div className="min-w-0">
         <h1 className="whitespace-nowrap text-[clamp(1.3rem,6.5vw,1.875rem)] font-bold text-zinc-900 sm:text-3xl md:text-4xl">
           奄美群島飲ミュニティマップ
