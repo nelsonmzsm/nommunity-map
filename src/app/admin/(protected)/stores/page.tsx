@@ -58,6 +58,7 @@ export default async function AdminStoresPage({
             <th className="py-2">店名</th>
             <th>ジャンル</th>
             <th>島</th>
+            <th>住所</th>
             <th>状態</th>
             <th>裏取り</th>
             <th></th>
@@ -69,6 +70,11 @@ export default async function AdminStoresPage({
               <td className="py-2 font-semibold">{store.name}</td>
               <td>{store.store_genres.map((sg) => sg.genre?.name).join("・")}</td>
               <td>{store.region?.name}</td>
+              <td className="text-zinc-500">
+                {store.prefecture}
+                {store.town}
+                {store.address}
+              </td>
               <td>{store.status === "published" ? "公開中" : "非公開"}</td>
               <td>
                 <span

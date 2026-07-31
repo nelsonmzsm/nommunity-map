@@ -156,11 +156,10 @@ export default function StoreForm({
       </div>
 
       <label className="flex flex-col gap-1 text-sm">
-        出身集落・町
+        出身集落・町（任意）
         <input
           name="village"
           type="text"
-          required
           defaultValue={initial?.village}
           className="rounded-lg border border-zinc-300 px-3 py-2"
         />
