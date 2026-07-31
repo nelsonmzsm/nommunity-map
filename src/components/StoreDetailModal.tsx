@@ -193,7 +193,7 @@ export default function StoreDetailModal({
                 お店の情報は最新でない可能性があります。ご利用の前に、現在も営業中かご確認ください。
               </p>
               <p className="mt-1.5">
-                本サイトの掲載情報は、原則的にお寄せいただいた口コミを元にしています。もし間違いを見つけられた場合は
+                本サイトは試験公開中です。掲載情報は、運営者が独自に収集、または提供を受けた店舗情報を元にしています。もし間違いを見つけられた場合は
                 <button
                   type="button"
                   onClick={onOpenSubmit}

@@ -121,6 +121,8 @@ export default function Home() {
         onChange={setFilters}
         view={mobileView}
         onChangeView={setMobileView}
+        shownCount={filteredStores.length}
+        totalCount={stores.length}
       />
 
       <div className="relative flex flex-1 overflow-hidden">

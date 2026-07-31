@@ -14,6 +14,8 @@ interface SearchFiltersProps {
   onChange: (filters: StoreFilters) => void;
   view: "map" | "list";
   onChangeView: (view: "map" | "list") => void;
+  shownCount: number;
+  totalCount: number;
 }
 
 export default function SearchFilters({
@@ -24,6 +26,8 @@ export default function SearchFilters({
   onChange,
   view,
   onChangeView,
+  shownCount,
+  totalCount,
 }: SearchFiltersProps) {
   const [filtersOpen, setFiltersOpen] = useState(false);
 
@@ -80,13 +84,18 @@ export default function SearchFilters({
           );
         })}
 
-        <input
-          type="text"
-          value={filters.keyword}
-          onChange={(e) => onChange({ ...filters, keyword: e.target.value })}
-          placeholder="店名・住所・キーワードで検索"
-          className="order-1 w-full rounded-lg border border-zinc-300 px-4 py-3 text-base focus:border-zinc-500 focus:outline-none sm:order-3 sm:w-56 sm:flex-none sm:py-2"
-        />
+        <div className="order-1 flex w-full items-center gap-2 sm:order-3 sm:w-auto">
+          <input
+            type="text"
+            value={filters.keyword}
+            onChange={(e) => onChange({ ...filters, keyword: e.target.value })}
+            placeholder="店名・住所・キーワードで検索"
+            className="w-full rounded-lg border border-zinc-300 px-4 py-3 text-base focus:border-zinc-500 focus:outline-none sm:w-56 sm:flex-none sm:py-2"
+          />
+          <span className="shrink-0 whitespace-nowrap text-xs font-semibold text-zinc-500">
+            {shownCount}/{totalCount}件
+          </span>
+        </div>
 
         <div className="order-4 hidden shrink-0 sm:block">{prefectureSelect}</div>
       </div>

@@ -2,9 +2,14 @@ export default function Header({ onOpenSubmit }: { onOpenSubmit: () => void }) {
   return (
     <header className="bg-tsumugi flex flex-col gap-3 border-b border-zinc-200 px-4 py-3">
       <div className="min-w-0">
-        <h1 className="whitespace-nowrap text-[clamp(1.3rem,6.5vw,1.875rem)] font-bold text-zinc-900 sm:text-3xl md:text-4xl">
-          奄美群島飲ミュニティマップ
-        </h1>
+        <div className="flex flex-wrap items-center gap-2">
+          <h1 className="whitespace-nowrap text-[clamp(1.3rem,6.5vw,1.875rem)] font-bold text-zinc-900 sm:text-3xl md:text-4xl">
+            奄美群島飲ミュニティマップ
+          </h1>
+          <span className="whitespace-nowrap rounded-full border border-amber-300 bg-amber-50 px-2 py-0.5 text-xs font-bold text-amber-700">
+            試験公開中
+          </span>
+        </div>
         <p className="mt-2 whitespace-nowrap text-[clamp(0.5rem,2.6vw,0.875rem)] text-zinc-500 sm:text-sm">
           飲んで、つながり、島になる。奄美群島ゆかりのお店だけを集めたサイト
         </p>
