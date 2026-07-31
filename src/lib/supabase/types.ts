@@ -43,6 +43,7 @@ type StoreRow = {
   reservation_url: string | null;
   provider_note: string | null;
   status: "published" | "hidden";
+  verified: boolean;
   created_at: string;
   updated_at: string;
 };

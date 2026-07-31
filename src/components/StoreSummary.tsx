@@ -3,6 +3,7 @@ import type { Store } from "@/types/store";
 import IslandBadge from "./IslandBadge";
 import GenreTag from "./GenreTag";
 import PhotoPlaceholder from "./PhotoPlaceholder";
+import VerifiedBadge from "./VerifiedBadge";
 
 export default function StoreSummary({ store }: { store: Store }) {
   const photo = store.photos[0];
@@ -28,6 +29,7 @@ export default function StoreSummary({ store }: { store: Store }) {
           {store.genres.map((g) => (
             <GenreTag key={g.id} name={g.name} />
           ))}
+          <VerifiedBadge verified={store.verified} compact />
         </div>
         <p className="mt-1 truncate text-lg font-bold text-zinc-900">
           {store.name}

@@ -6,6 +6,7 @@ import type { Store } from "@/types/store";
 import IslandBadge from "./IslandBadge";
 import GenreTag from "./GenreTag";
 import PhotoPlaceholder from "./PhotoPlaceholder";
+import VerifiedBadge from "./VerifiedBadge";
 
 export default function StoreDetailModal({
   store,
@@ -58,13 +59,14 @@ export default function StoreDetailModal({
             <ChevronLeft className="h-5 w-5" />
           </button>
 
-          <div className="flex flex-1 items-center gap-2 px-1">
+          <div className="flex flex-1 flex-wrap items-center gap-1.5 px-1">
             <IslandBadge region={store.region} />
             {store.isAd && (
               <span className="rounded-full bg-zinc-900 px-2.5 py-1 text-xs font-bold text-white">
                 PR
               </span>
             )}
+            <VerifiedBadge verified={store.verified} />
           </div>
 
           <button

@@ -27,6 +27,7 @@ function storeFieldsFromForm(formData: FormData) {
     is_ad: formData.get("isAd") === "on",
     reservation_url: String(formData.get("reservationUrl") ?? "") || null,
     provider_note: String(formData.get("providerNote") ?? "") || null,
+    verified: formData.get("verified") === "on",
   };
 }
 
@@ -80,6 +81,16 @@ export async function toggleStoreStatus(id: string, status: "published" | "hidde
   await supabase
     .from("stores")
     .update({ status: status === "published" ? "hidden" : "published" })
+    .eq("id", id);
+  revalidatePath("/admin/stores");
+}
+
+export async function toggleStoreVerified(id: string, verified: boolean) {
+  await requireAdmin();
+  const supabase = createAdminClient();
+  await supabase
+    .from("stores")
+    .update({ verified: !verified })
     .eq("id", id);
   revalidatePath("/admin/stores");
 }

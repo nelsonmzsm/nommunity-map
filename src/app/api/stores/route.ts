@@ -39,6 +39,7 @@ export async function GET() {
     isAd: s.is_ad,
     reservationUrl: s.reservation_url ?? undefined,
     providerNote: s.provider_note ?? undefined,
+    verified: s.verified,
   }));
 
   return NextResponse.json(stores);

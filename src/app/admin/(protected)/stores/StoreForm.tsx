@@ -24,6 +24,7 @@ interface StoreFormValues {
   is_ad?: boolean;
   reservation_url?: string | null;
   provider_note?: string | null;
+  verified?: boolean;
 }
 
 export default function StoreForm({
@@ -84,6 +85,15 @@ export default function StoreForm({
           defaultValue={initial?.name}
           className="rounded-lg border border-zinc-300 px-3 py-2"
         />
+      </label>
+
+      <label className="flex items-center gap-2 text-sm">
+        <input
+          name="verified"
+          type="checkbox"
+          defaultChecked={initial?.verified}
+        />
+        裏取り済み（店主・関係者への確認など、情報の正確性を確認済み）
       </label>
 
       <fieldset className="flex flex-col gap-1 text-sm">
