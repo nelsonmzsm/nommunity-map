@@ -76,8 +76,12 @@ export default function StoreForm({
 
   return (
     <form action={action} className="flex max-w-xl flex-col gap-3">
+      <p className="text-xs text-zinc-500">
+        <span className="text-red-600">※</span> は必須項目です
+      </p>
+
       <label className="flex flex-col gap-1 text-sm">
-        店名
+        店名 <span className="text-red-600">※</span>
         <input
           name="name"
           type="text"
@@ -114,7 +118,7 @@ export default function StoreForm({
       </fieldset>
 
       <label className="flex flex-col gap-1 text-sm">
-        島
+        島 <span className="text-red-600">※</span>
         <select
           name="regionId"
           required
@@ -132,7 +136,7 @@ export default function StoreForm({
 
       <div className="grid grid-cols-2 gap-3">
         <label className="flex flex-col gap-1 text-sm">
-          都道府県
+          都道府県 <span className="text-red-600">※</span>
           <input
             ref={prefectureRef}
             name="prefecture"
@@ -143,7 +147,7 @@ export default function StoreForm({
           />
         </label>
         <label className="flex flex-col gap-1 text-sm">
-          市区町村
+          市区町村 <span className="text-red-600">※</span>
           <input
             ref={townRef}
             name="town"
@@ -166,7 +170,7 @@ export default function StoreForm({
       </label>
 
       <label className="flex flex-col gap-1 text-sm">
-        住所
+        住所 <span className="text-red-600">※</span>
         <input
           ref={addressRef}
           name="address"
@@ -179,7 +183,7 @@ export default function StoreForm({
 
       <div className="grid grid-cols-2 gap-3">
         <label className="flex flex-col gap-1 text-sm">
-          緯度(lat)
+          緯度(lat) <span className="text-red-600">※</span>
           <input
             ref={latRef}
             name="lat"
@@ -191,7 +195,7 @@ export default function StoreForm({
           />
         </label>
         <label className="flex flex-col gap-1 text-sm">
-          経度(lng)
+          経度(lng) <span className="text-red-600">※</span>
           <input
             ref={lngRef}
             name="lng"
