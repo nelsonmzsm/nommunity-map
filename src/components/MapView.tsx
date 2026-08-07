@@ -37,17 +37,17 @@ function SelectedStorePanner({
   return null;
 }
 
-function PrefectureFocuser({
-  prefecture,
+function FilteredStoresFocuser({
+  active,
   stores,
 }: {
-  prefecture: string;
+  active: boolean;
   stores: Store[];
 }) {
   const map = useMap();
 
   useEffect(() => {
-    if (!map || !prefecture || stores.length === 0) return;
+    if (!map || !active || stores.length === 0) return;
 
     if (stores.length === 1) {
       map.panTo({ lat: stores[0].lat, lng: stores[0].lng });
@@ -62,7 +62,7 @@ function PrefectureFocuser({
     map.panTo(bounds.getCenter());
     map.fitBounds(bounds, 64);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [map, prefecture]);
+  }, [map, active, stores]);
 
   return null;
 }
@@ -70,7 +70,7 @@ function PrefectureFocuser({
 interface MapViewProps {
   stores: Store[];
   selectedStoreId: string | null;
-  prefecture: string;
+  hasActiveFilter: boolean;
   onSelectStore: (id: string | null) => void;
   onOpenDetail: (store: Store) => void;
 }
@@ -78,7 +78,7 @@ interface MapViewProps {
 export default function MapView({
   stores,
   selectedStoreId,
-  prefecture,
+  hasActiveFilter,
   onSelectStore,
   onOpenDetail,
 }: MapViewProps) {
@@ -159,7 +159,7 @@ export default function MapView({
         <SelectedStorePanner
           position={selectedStore ? { lat: selectedStore.lat, lng: selectedStore.lng } : null}
         />
-        <PrefectureFocuser prefecture={prefecture} stores={stores} />
+        <FilteredStoresFocuser active={hasActiveFilter} stores={stores} />
 
         {stores.map((store) => (
           <AdvancedMarker

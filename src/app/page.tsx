@@ -27,8 +27,14 @@ export default function Home() {
   const [detailStore, setDetailStore] = useState<Store | null>(null);
   const [submitOpen, setSubmitOpen] = useState(false);
 
+  const selectStore = (id: string | null) => {
+    setSelectedStoreId(id);
+    const url = id ? `${window.location.pathname}?store=${id}` : window.location.pathname;
+    window.history.replaceState(null, "", url);
+  };
+
   const openDetail = (store: Store) => {
-    setSelectedStoreId(store.id);
+    selectStore(store.id);
     setDetailStore(store);
   };
 
@@ -51,6 +57,15 @@ export default function Home() {
         setGenres(genresData);
         setRegions(regionsData);
         setLoading(false);
+
+        const storeId = new URLSearchParams(window.location.search).get("store");
+        if (storeId) {
+          const store = (storesData as Store[]).find((s) => s.id === storeId);
+          if (store) {
+            setSelectedStoreId(store.id);
+            setDetailStore(store);
+          }
+        }
       }
     }
 
@@ -110,6 +125,12 @@ export default function Home() {
     );
   }, [storesMatchingNonPrefectureFilters, effectivePrefecture]);
 
+  const hasActiveFilter =
+    filters.keyword.trim() !== "" ||
+    filters.regionIds.length > 0 ||
+    filters.genreIds.length > 0 ||
+    effectivePrefecture !== "";
+
   return (
     <div className="flex h-dvh flex-col">
       <Header onOpenSubmit={() => setSubmitOpen(true)} />
@@ -139,8 +160,8 @@ export default function Home() {
             <MapView
               stores={filteredStores}
               selectedStoreId={selectedStoreId}
-              prefecture={effectivePrefecture}
-              onSelectStore={setSelectedStoreId}
+              hasActiveFilter={hasActiveFilter}
+              onSelectStore={selectStore}
               onOpenDetail={openDetail}
             />
           )}
@@ -154,7 +175,7 @@ export default function Home() {
           <StoreList
             stores={filteredStores}
             selectedStoreId={selectedStoreId}
-            onSelectStore={(store) => setSelectedStoreId(store.id)}
+            onSelectStore={(store) => selectStore(store.id)}
             onOpenDetail={openDetail}
           />
         </div>
