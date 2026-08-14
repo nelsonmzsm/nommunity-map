@@ -25,7 +25,7 @@ export default function Header({ onOpenSubmit }: { onOpenSubmit: () => void }) {
             お店の情報を教える
           </button>
           <a
-            href="https://vietmaru.com/works"
+            href="https://nelsonmzsm.github.io/"
             target="_blank"
             rel="noopener noreferrer"
             className="whitespace-nowrap rounded-full border border-zinc-300 px-2 py-1 text-[10px] font-medium text-zinc-500 hover:bg-zinc-100 sm:px-3 sm:py-1.5 sm:text-xs"
