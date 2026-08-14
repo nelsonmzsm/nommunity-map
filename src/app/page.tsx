@@ -199,7 +199,7 @@ export default function Home() {
         />
       )}
 
-      {submitOpen && <SubmitModal onClose={() => setSubmitOpen(false)} />}
+      <SubmitModal open={submitOpen} onClose={() => setSubmitOpen(false)} />
     </div>
   );
 }

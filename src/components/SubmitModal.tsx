@@ -8,7 +8,13 @@ interface Option {
   name: string;
 }
 
-export default function SubmitModal({ onClose }: { onClose: () => void }) {
+export default function SubmitModal({
+  open,
+  onClose,
+}: {
+  open: boolean;
+  onClose: () => void;
+}) {
   const [genres, setGenres] = useState<Option[]>([]);
   const [regions, setRegions] = useState<Option[]>([]);
   const [stores, setStores] = useState<Option[]>([]);
@@ -44,7 +50,9 @@ export default function SubmitModal({ onClose }: { onClose: () => void }) {
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-end justify-center bg-black/40 sm:items-center sm:p-4"
+      className={`fixed inset-0 z-50 items-end justify-center bg-black/40 sm:items-center sm:p-4 ${
+        open ? "flex" : "hidden"
+      }`}
       onClick={onClose}
     >
       <div
