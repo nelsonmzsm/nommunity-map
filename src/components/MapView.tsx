@@ -49,18 +49,32 @@ function FilteredStoresFocuser({
   useEffect(() => {
     if (!map || !active || stores.length === 0) return;
 
-    if (stores.length === 1) {
-      map.panTo({ lat: stores[0].lat, lng: stores[0].lng });
-      if ((map.getZoom() ?? 0) < SELECTED_STORE_PAN_ZOOM) {
-        map.setZoom(SELECTED_STORE_PAN_ZOOM);
+    // 地図コンテナのサイズがレイアウト確定前だと fitBounds が
+    // 誤った（極端に引いた）ズームを計算することがあるため、
+    // 1フレーム待ってから実行する。
+    const frame = requestAnimationFrame(() => {
+      if (stores.length === 1) {
+        map.panTo({ lat: stores[0].lat, lng: stores[0].lng });
+        if ((map.getZoom() ?? 0) < SELECTED_STORE_PAN_ZOOM) {
+          map.setZoom(SELECTED_STORE_PAN_ZOOM);
+        }
+        return;
       }
-      return;
-    }
 
-    const bounds = new google.maps.LatLngBounds();
-    stores.forEach((store) => bounds.extend({ lat: store.lat, lng: store.lng }));
-    map.panTo(bounds.getCenter());
-    map.fitBounds(bounds, 64);
+      const bounds = new google.maps.LatLngBounds();
+      stores.forEach((store) => bounds.extend({ lat: store.lat, lng: store.lng }));
+      if (bounds.isEmpty()) return;
+      map.panTo(bounds.getCenter());
+      map.fitBounds(bounds, 64);
+      // fitBoundsの計算が不安定な場合の保険として、日本全体より
+      // 引きすぎたズームにはならないよう下限をかける。
+      google.maps.event.addListenerOnce(map, "idle", () => {
+        if ((map.getZoom() ?? 0) < DEFAULT_ZOOM) {
+          map.setZoom(DEFAULT_ZOOM);
+        }
+      });
+    });
+    return () => cancelAnimationFrame(frame);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [map, active, stores]);
 
