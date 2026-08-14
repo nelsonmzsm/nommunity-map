@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Header from "@/components/Header";
+import RecentStoresTicker from "@/components/RecentStoresTicker";
 import SearchFilters from "@/components/SearchFilters";
 import MapView from "@/components/MapView";
 import StoreList from "@/components/StoreList";
@@ -134,6 +135,7 @@ export default function Home() {
   return (
     <div className="flex h-dvh flex-col">
       <Header onOpenSubmit={() => setSubmitOpen(true)} />
+      <RecentStoresTicker stores={stores} />
       <SearchFilters
         filters={{ ...filters, prefecture: effectivePrefecture }}
         genres={genres}
