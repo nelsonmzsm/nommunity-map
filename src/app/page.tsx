@@ -136,7 +136,7 @@ export default function Home() {
   return (
     <div className="flex h-dvh flex-col">
       <Header onOpenSubmit={() => setSubmitOpen(true)} />
-      <RecentStoresTicker stores={stores} />
+      <RecentStoresTicker stores={stores} onSelectStore={openDetail} />
       <SearchFilters
         filters={{ ...filters, prefecture: effectivePrefecture }}
         genres={genres}
