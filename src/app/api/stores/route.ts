@@ -40,6 +40,7 @@ export async function GET() {
     reservationUrl: s.reservation_url ?? undefined,
     providerNote: s.provider_note ?? undefined,
     verified: s.verified,
+    createdAt: s.created_at,
   }));
 
   return NextResponse.json(stores);
