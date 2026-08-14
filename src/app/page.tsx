@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Header from "@/components/Header";
+import MobileActionBar from "@/components/MobileActionBar";
 import RecentStoresTicker from "@/components/RecentStoresTicker";
 import SearchFilters from "@/components/SearchFilters";
 import MapView from "@/components/MapView";
@@ -182,6 +183,8 @@ export default function Home() {
           />
         </div>
       </div>
+
+      <MobileActionBar onOpenSubmit={() => setSubmitOpen(true)} />
 
       {detailStore && (
         <StoreDetailModal

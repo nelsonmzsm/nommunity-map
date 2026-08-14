@@ -60,6 +60,27 @@ export default function SearchFilters({
     </select>
   );
 
+  const regionButtons = regions.map((region) => {
+    const active = filters.regionIds.includes(region.id);
+    return (
+      <button
+        key={region.id}
+        type="button"
+        onClick={() => toggleRegion(region.id)}
+        className={`shrink-0 whitespace-nowrap rounded-full px-4 py-2 text-base font-semibold transition-shadow ${
+          active ? "ring-2 ring-zinc-900 ring-offset-1" : ""
+        }`}
+        style={{
+          backgroundColor: active ? region.colorBorder : region.color,
+          color: "#ffffff",
+          border: `1.5px solid ${region.colorBorder}`,
+        }}
+      >
+        {region.name}
+      </button>
+    );
+  });
+
   return (
     <div className="bg-tsumugi flex flex-col gap-3 border-b border-zinc-200 p-3">
       <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center sm:gap-2">
@@ -76,27 +97,8 @@ export default function SearchFilters({
           </span>
         </div>
 
-        <div className="order-2 -mx-3 flex gap-1 overflow-x-auto px-3 pb-0.5 sm:order-none sm:mx-0 sm:flex-wrap sm:gap-2 sm:overflow-visible sm:px-0 sm:pb-0">
-          {regions.map((region) => {
-            const active = filters.regionIds.includes(region.id);
-            return (
-              <button
-                key={region.id}
-                type="button"
-                onClick={() => toggleRegion(region.id)}
-                className={`shrink-0 whitespace-nowrap rounded-full px-1.5 py-1 text-[10px] font-semibold transition-shadow sm:px-4 sm:py-2 sm:text-base ${
-                  active ? "ring-2 ring-zinc-900 ring-offset-1" : ""
-                }`}
-                style={{
-                  backgroundColor: active ? region.colorBorder : region.color,
-                  color: "#ffffff",
-                  border: `1.5px solid ${region.colorBorder}`,
-                }}
-              >
-                {region.name}
-              </button>
-            );
-          })}
+        <div className="order-2 hidden shrink-0 flex-wrap gap-2 sm:flex">
+          {regionButtons}
         </div>
 
         <div className="order-4 hidden shrink-0 sm:block">{prefectureSelect}</div>
@@ -135,6 +137,8 @@ export default function SearchFilters({
       <div
         className={`${filtersOpen ? "flex" : "hidden"} flex-col gap-3 sm:flex`}
       >
+        <div className="flex flex-wrap gap-2 sm:hidden">{regionButtons}</div>
+
         <div className="sm:hidden">{prefectureSelect}</div>
 
         <div className="flex flex-wrap gap-2">
