@@ -162,6 +162,7 @@ export default function Home() {
           ) : (
             <MapView
               stores={filteredStores}
+              regions={regions}
               selectedStoreId={selectedStoreId}
               hasActiveFilter={hasActiveFilter}
               onSelectStore={selectStore}

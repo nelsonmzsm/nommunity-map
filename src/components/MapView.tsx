@@ -9,7 +9,7 @@ import {
   InfoWindow,
   useMap,
 } from "@vis.gl/react-google-maps";
-import type { Store } from "@/types/store";
+import type { Region, Store } from "@/types/store";
 import StoreBalloon from "./StoreBalloon";
 
 const DEFAULT_CENTER = { lat: 35.3, lng: 137.5 };
@@ -81,8 +81,38 @@ function FilteredStoresFocuser({
   return null;
 }
 
+function MapLegend({ regions }: { regions: Region[] }) {
+  const [open, setOpen] = useState(false);
+
+  return (
+    <div className="absolute left-2 top-12 z-10">
+      <button
+        type="button"
+        onClick={() => setOpen((o) => !o)}
+        className="flex items-center gap-1 rounded-full border border-zinc-300 bg-white px-3 py-1.5 text-xs font-bold text-zinc-700 shadow-md hover:bg-zinc-50"
+      >
+        凡例 {open ? "▲" : "▾"}
+      </button>
+      {open && (
+        <div className="mt-1 grid grid-cols-2 gap-x-3 gap-y-1 rounded-lg border border-zinc-300 bg-white p-2.5 text-xs shadow-lg">
+          {regions.map((region) => (
+            <div key={region.id} className="flex items-center gap-1.5 whitespace-nowrap text-zinc-700">
+              <span
+                className="h-2 w-2 shrink-0 rounded-full"
+                style={{ backgroundColor: region.color }}
+              />
+              {region.name}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 interface MapViewProps {
   stores: Store[];
+  regions: Region[];
   selectedStoreId: string | null;
   hasActiveFilter: boolean;
   onSelectStore: (id: string | null) => void;
@@ -91,6 +121,7 @@ interface MapViewProps {
 
 export default function MapView({
   stores,
+  regions,
   selectedStoreId,
   hasActiveFilter,
   onSelectStore,
@@ -160,46 +191,50 @@ export default function MapView({
   }
 
   return (
-    <APIProvider apiKey={apiKey}>
-      <Map
-        mapId="DEMO_MAP_ID"
-        defaultCenter={center}
-        defaultZoom={zoom}
-        gestureHandling="greedy"
-        disableDefaultUI={false}
-        className="h-full w-full"
-        onClick={() => onSelectStore(null)}
-      >
-        <SelectedStorePanner
-          position={selectedStore ? { lat: selectedStore.lat, lng: selectedStore.lng } : null}
-        />
-        <FilteredStoresFocuser active={hasActiveFilter} stores={stores} />
+    <div className="relative h-full w-full">
+      <APIProvider apiKey={apiKey}>
+        <Map
+          mapId="DEMO_MAP_ID"
+          defaultCenter={center}
+          defaultZoom={zoom}
+          gestureHandling="greedy"
+          disableDefaultUI={false}
+          className="h-full w-full"
+          onClick={() => onSelectStore(null)}
+        >
+          <SelectedStorePanner
+            position={selectedStore ? { lat: selectedStore.lat, lng: selectedStore.lng } : null}
+          />
+          <FilteredStoresFocuser active={hasActiveFilter} stores={stores} />
 
-        {stores.map((store) => (
-          <AdvancedMarker
-            key={store.id}
-            position={{ lat: store.lat, lng: store.lng }}
-            onClick={() => onSelectStore(store.id)}
-          >
-            <Pin
-              background={store.region.color}
-              borderColor={store.region.colorBorder}
-              glyphColor="#ffffff"
-              scale={store.id === selectedStoreId ? 1.9 : 1.5}
-            />
-          </AdvancedMarker>
-        ))}
+          {stores.map((store) => (
+            <AdvancedMarker
+              key={store.id}
+              position={{ lat: store.lat, lng: store.lng }}
+              onClick={() => onSelectStore(store.id)}
+            >
+              <Pin
+                background={store.region.color}
+                borderColor={store.region.colorBorder}
+                glyphColor="#ffffff"
+                scale={store.id === selectedStoreId ? 1.9 : 1.5}
+              />
+            </AdvancedMarker>
+          ))}
 
-        {selectedStore && (
-          <InfoWindow
-            position={{ lat: selectedStore.lat, lng: selectedStore.lng }}
-            onCloseClick={() => onSelectStore(null)}
-            maxWidth={300}
-          >
-            <StoreBalloon store={selectedStore} onOpenDetail={onOpenDetail} />
-          </InfoWindow>
-        )}
-      </Map>
-    </APIProvider>
+          {selectedStore && (
+            <InfoWindow
+              position={{ lat: selectedStore.lat, lng: selectedStore.lng }}
+              onCloseClick={() => onSelectStore(null)}
+              maxWidth={300}
+            >
+              <StoreBalloon store={selectedStore} onOpenDetail={onOpenDetail} />
+            </InfoWindow>
+          )}
+        </Map>
+      </APIProvider>
+
+      <MapLegend regions={regions} />
+    </div>
   );
 }
