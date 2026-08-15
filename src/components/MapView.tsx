@@ -66,13 +66,6 @@ function FilteredStoresFocuser({
       if (bounds.isEmpty()) return;
       map.panTo(bounds.getCenter());
       map.fitBounds(bounds, 64);
-      // fitBoundsの計算が不安定な場合の保険として、日本全体より
-      // 引きすぎたズームにはならないよう下限をかける。
-      google.maps.event.addListenerOnce(map, "idle", () => {
-        if ((map.getZoom() ?? 0) < DEFAULT_ZOOM) {
-          map.setZoom(DEFAULT_ZOOM);
-        }
-      });
     });
     return () => cancelAnimationFrame(frame);
     // eslint-disable-next-line react-hooks/exhaustive-deps
