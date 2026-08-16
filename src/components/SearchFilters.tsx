@@ -1,4 +1,3 @@
-import { useState } from "react";
 import type { Genre, Region, StoreFilters } from "@/types/store";
 
 interface PrefectureOption {
@@ -16,6 +15,8 @@ interface SearchFiltersProps {
   onChangeView: (view: "map" | "list") => void;
   shownCount: number;
   totalCount: number;
+  filtersOpen: boolean;
+  onFiltersOpenChange: (open: boolean) => void;
 }
 
 export default function SearchFilters({
@@ -28,9 +29,9 @@ export default function SearchFilters({
   onChangeView,
   shownCount,
   totalCount,
+  filtersOpen,
+  onFiltersOpenChange,
 }: SearchFiltersProps) {
-  const [filtersOpen, setFiltersOpen] = useState(false);
-
   const toggleRegion = (regionId: string) => {
     const regionIds = filters.regionIds.includes(regionId)
       ? filters.regionIds.filter((id) => id !== regionId)
@@ -127,7 +128,7 @@ export default function SearchFilters({
 
       <button
         type="button"
-        onClick={() => setFiltersOpen((open) => !open)}
+        onClick={() => onFiltersOpenChange(!filtersOpen)}
         className="flex items-center justify-center gap-1 rounded-full border border-zinc-300 bg-white px-4 py-2 text-sm font-semibold text-zinc-700 sm:hidden"
       >
         {filtersOpen ? "閉じる" : "お店を探す"}

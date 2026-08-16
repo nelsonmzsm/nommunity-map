@@ -28,6 +28,7 @@ export default function Home() {
   const [selectedStoreId, setSelectedStoreId] = useState<string | null>(null);
   const [detailStore, setDetailStore] = useState<Store | null>(null);
   const [submitOpen, setSubmitOpen] = useState(false);
+  const [filtersOpen, setFiltersOpen] = useState(false);
 
   const selectStore = (id: string | null) => {
     setSelectedStoreId(id);
@@ -133,6 +134,12 @@ export default function Home() {
     filters.genreIds.length > 0 ||
     effectivePrefecture !== "";
 
+  // モバイルの「お店を探す」パネルが開いている間は地図の表示領域が
+  // 大きく縮んでいるため、その間はfitBounds等のフォーカス処理を
+  // 実行しない（誤ったズームになるのを防ぐ）。パネルを閉じた瞬間に
+  // 改めてフォーカスさせる。
+  const shouldFocusMap = hasActiveFilter && !filtersOpen;
+
   return (
     <div className="flex h-dvh flex-col">
       <Header onOpenSubmit={() => setSubmitOpen(true)} />
@@ -147,6 +154,8 @@ export default function Home() {
         onChangeView={setMobileView}
         shownCount={filteredStores.length}
         totalCount={stores.length}
+        filtersOpen={filtersOpen}
+        onFiltersOpenChange={setFiltersOpen}
       />
 
       <div className="relative flex flex-1 overflow-hidden">
@@ -164,7 +173,7 @@ export default function Home() {
               stores={filteredStores}
               regions={regions}
               selectedStoreId={selectedStoreId}
-              hasActiveFilter={hasActiveFilter}
+              hasActiveFilter={shouldFocusMap}
               onSelectStore={selectStore}
               onOpenDetail={openDetail}
             />
