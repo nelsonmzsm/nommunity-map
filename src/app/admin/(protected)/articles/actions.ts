@@ -4,9 +4,9 @@ import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { requireAdmin } from "@/lib/supabase/require-admin";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { uploadImageToStorage } from "@/lib/supabase-storage";
 import {
   isDriveConfigured,
-  uploadPhotoToDrive,
   extractGoogleDocId,
   exportGoogleDocAsHtml,
 } from "@/lib/google-drive";
@@ -30,7 +30,7 @@ function articleFieldsFromForm(formData: FormData) {
 }
 
 // 本文編集エリアへの画像ドラッグ&ドロップから呼ばれる。
-// アップロード先はお店の投稿フォームと同じGoogle Driveの共有フォルダ。
+// アップロード先はSupabase Storageの公開バケット。
 export async function uploadArticleImage(
   formData: FormData
 ): Promise<{ url?: string; error?: string }> {
@@ -46,12 +46,9 @@ export async function uploadArticleImage(
   if (file.size > MAX_IMAGE_BYTES) {
     return { error: `画像は${MAX_IMAGE_MB}MBまでです` };
   }
-  if (!isDriveConfigured()) {
-    return { error: "画像アップロード先（Google Drive）が未設定です" };
-  }
 
   try {
-    const url = await uploadPhotoToDrive(file);
+    const url = await uploadImageToStorage(file, "articles");
     return { url };
   } catch (e) {
     return { error: e instanceof Error ? e.message : "アップロードに失敗しました" };
@@ -60,15 +57,11 @@ export async function uploadArticleImage(
 
 // Google Docs等からのコピペで本文に紛れ込む画像URL（例:
 // googleusercontent.com）は、ブラウザから直接fetchするとCORSで弾かれることが
-// 多いため、サーバー側で取得してDriveへ保存し直す。
+// 多いため、サーバー側で取得してSupabase Storageへ保存し直す。
 export async function uploadArticleImageFromUrl(
   sourceUrl: string
 ): Promise<{ url?: string; error?: string }> {
   await requireAdmin();
-
-  if (!isDriveConfigured()) {
-    return { error: "画像アップロード先（Google Drive）が未設定です" };
-  }
 
   let parsed: URL;
   try {
@@ -95,7 +88,7 @@ export async function uploadArticleImageFromUrl(
     }
     const ext = contentType.split("/")[1]?.split(/[+;]/)[0] || "png";
     const file = new File([buffer], `pasted_${Date.now()}.${ext}`, { type: contentType });
-    const url = await uploadPhotoToDrive(file);
+    const url = await uploadImageToStorage(file, "articles");
     return { url };
   } catch (e) {
     return { error: e instanceof Error ? e.message : "アップロードに失敗しました" };

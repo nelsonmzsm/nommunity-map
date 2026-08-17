@@ -2,7 +2,7 @@
 
 import { z } from "zod";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { isDriveConfigured, uploadPhotoToDrive } from "@/lib/google-drive";
+import { uploadImageToStorage } from "@/lib/supabase-storage";
 
 const submissionSchema = z.object({
   kind: z.enum(["new", "correction"]),
@@ -92,18 +92,16 @@ export async function submitStore(
 
   let photos: string[] = [];
   if (photoFiles.length > 0) {
-    if (isDriveConfigured()) {
-      try {
-        photos = await Promise.all(photoFiles.map((file) => uploadPhotoToDrive(file)));
-      } catch (err) {
-        console.error("Google Drive upload failed:", err);
-        return {
-          status: "error",
-          message: "写真のアップロードに失敗しました。時間をおいて再度お試しください。",
-        };
-      }
-    } else {
-      console.warn("Google Drive is not configured; skipping photo upload.");
+    try {
+      photos = await Promise.all(
+        photoFiles.map((file) => uploadImageToStorage(file, "submissions"))
+      );
+    } catch (err) {
+      console.error("Photo upload failed:", err);
+      return {
+        status: "error",
+        message: "写真のアップロードに失敗しました。時間をおいて再度お試しください。",
+      };
     }
   }
 
