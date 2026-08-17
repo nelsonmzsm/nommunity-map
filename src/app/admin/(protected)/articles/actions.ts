@@ -4,12 +4,12 @@ import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { requireAdmin } from "@/lib/supabase/require-admin";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { isDriveConfigured, uploadPhotoToDrive } from "@/lib/google-drive";
+
+const MAX_IMAGE_MB = 5;
+const MAX_IMAGE_BYTES = MAX_IMAGE_MB * 1024 * 1024;
 
 function articleFieldsFromForm(formData: FormData) {
-  const photos = String(formData.get("photos") ?? "")
-    .split("\n")
-    .map((url) => url.trim())
-    .filter(Boolean);
   const status: "draft" | "published" =
     formData.get("status") === "published" ? "published" : "draft";
 
@@ -18,10 +18,39 @@ function articleFieldsFromForm(formData: FormData) {
     slug: String(formData.get("slug") ?? "").trim(),
     title: String(formData.get("title") ?? ""),
     cover_photo: String(formData.get("coverPhoto") ?? "") || null,
-    photos,
+    photos: [] as string[],
     body: String(formData.get("body") ?? ""),
     status,
   };
+}
+
+// 本文編集エリアへの画像ドラッグ&ドロップから呼ばれる。
+// アップロード先はお店の投稿フォームと同じGoogle Driveの共有フォルダ。
+export async function uploadArticleImage(
+  formData: FormData
+): Promise<{ url?: string; error?: string }> {
+  await requireAdmin();
+
+  const file = formData.get("file");
+  if (!(file instanceof File) || file.size === 0) {
+    return { error: "画像ファイルが見つかりません" };
+  }
+  if (!file.type.startsWith("image/")) {
+    return { error: "画像ファイルのみアップロードできます" };
+  }
+  if (file.size > MAX_IMAGE_BYTES) {
+    return { error: `画像は${MAX_IMAGE_MB}MBまでです` };
+  }
+  if (!isDriveConfigured()) {
+    return { error: "画像アップロード先（Google Drive）が未設定です" };
+  }
+
+  try {
+    const url = await uploadPhotoToDrive(file);
+    return { url };
+  } catch (e) {
+    return { error: e instanceof Error ? e.message : "アップロードに失敗しました" };
+  }
 }
 
 export async function createArticle(formData: FormData) {

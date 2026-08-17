@@ -1,8 +1,13 @@
 "use client";
 
+import ArticleBodyEditor from "./ArticleBodyEditor";
+
 interface StoreOption {
   id: string;
   name: string;
+  prefecture: string;
+  town: string;
+  address: string;
 }
 
 interface ArticleFormValues {
@@ -10,7 +15,6 @@ interface ArticleFormValues {
   slug?: string;
   title?: string;
   cover_photo?: string | null;
-  photos?: string[];
   body?: string;
   status?: "draft" | "published";
 }
@@ -49,7 +53,9 @@ export default function ArticleForm({
           <option value="">選択してください</option>
           {stores.map((store) => (
             <option key={store.id} value={store.id}>
-              {store.name}
+              {store.name}（{store.prefecture}
+              {store.town}
+              {store.address}）
             </option>
           ))}
         </select>
@@ -99,26 +105,7 @@ export default function ArticleForm({
         />
       </label>
 
-      <label className="flex flex-col gap-1 text-sm">
-        本文中の写真URL（1行に1つ）
-        <textarea
-          name="photos"
-          rows={3}
-          defaultValue={initial?.photos?.join("\n")}
-          className="rounded-lg border border-zinc-300 px-3 py-2"
-        />
-      </label>
-
-      <label className="flex flex-col gap-1 text-sm">
-        本文 <span className="text-red-600">※</span>
-        <textarea
-          name="body"
-          rows={14}
-          required
-          defaultValue={initial?.body}
-          className="rounded-lg border border-zinc-300 px-3 py-2"
-        />
-      </label>
+      <ArticleBodyEditor initialBody={initial?.body} />
 
       <fieldset className="flex flex-col gap-1 text-sm">
         <legend>公開状態</legend>

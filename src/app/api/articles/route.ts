@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { excerptFromBody } from "@/lib/article-body";
 import type { ArticleSummary } from "@/types/article";
 
 const EXCERPT_LENGTH = 200;
@@ -24,7 +25,7 @@ export async function GET() {
     slug: a.slug,
     title: a.title,
     coverPhoto: a.cover_photo ?? undefined,
-    excerpt: a.body.slice(0, EXCERPT_LENGTH),
+    excerpt: excerptFromBody(a.body, EXCERPT_LENGTH),
     publishedAt: a.published_at,
     store: {
       id: a.store.id,

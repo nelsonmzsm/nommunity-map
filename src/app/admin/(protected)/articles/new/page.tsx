@@ -5,7 +5,7 @@ import { createArticle } from "../actions";
 export default async function NewArticlePage() {
   const supabase = createAdminClient();
   const [{ data: stores }, { data: existingArticles }] = await Promise.all([
-    supabase.from("stores").select("id, name").order("name"),
+    supabase.from("stores").select("id, name, prefecture, town, address").order("name"),
     supabase.from("articles").select("store_id"),
   ]);
   const storeIdsWithArticle = new Set((existingArticles ?? []).map((a) => a.store_id));

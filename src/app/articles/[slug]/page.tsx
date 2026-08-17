@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
+import { parseArticleBody, excerptFromBody } from "@/lib/article-body";
 import IslandBadge from "@/components/IslandBadge";
 import GenreTag from "@/components/GenreTag";
 
@@ -30,12 +31,13 @@ export async function generateMetadata({
   const article = await getArticle(slug);
   if (!article) return {};
 
+  const description = excerptFromBody(article.body, 120);
   return {
     title: `${article.title} | 奄美群島飲ミュニティマップ`,
-    description: article.body.slice(0, 120),
+    description,
     openGraph: {
       title: article.title,
-      description: article.body.slice(0, 120),
+      description,
       images: article.cover_photo ? [article.cover_photo] : undefined,
     },
   };
@@ -113,29 +115,32 @@ export default async function ArticlePage({
           </Link>
         </div>
 
-        <div className="whitespace-pre-wrap text-base leading-relaxed text-zinc-800">
-          {article.body}
-        </div>
-
-        {article.photos && article.photos.length > 0 && (
-          <div className="flex flex-col gap-2">
-            {article.photos.map((photo: string, i: number) => (
+        <div className="flex flex-col gap-4">
+          {parseArticleBody(article.body).map((segment, i) =>
+            segment.type === "image" ? (
               <div
                 key={i}
                 className="relative h-56 w-full overflow-hidden rounded-xl bg-zinc-100 sm:h-72"
               >
                 <Image
-                  src={photo}
-                  alt={`${article.title} 写真${i + 1}`}
+                  src={segment.url}
+                  alt={segment.alt || article.title}
                   fill
                   sizes="100vw"
                   className="object-cover"
                   unoptimized
                 />
               </div>
-            ))}
-          </div>
-        )}
+            ) : (
+              <p
+                key={i}
+                className="whitespace-pre-wrap text-base leading-relaxed text-zinc-800"
+              >
+                {segment.content}
+              </p>
+            )
+          )}
+        </div>
       </div>
 
       <div className="fixed inset-x-0 bottom-0 z-40 border-t border-zinc-200 bg-white/95 backdrop-blur">

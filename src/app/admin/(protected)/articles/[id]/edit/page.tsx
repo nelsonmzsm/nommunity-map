@@ -13,7 +13,7 @@ export default async function EditArticlePage({
 
   const [{ data: article }, { data: stores }] = await Promise.all([
     supabase.from("articles").select("*").eq("id", id).single(),
-    supabase.from("stores").select("id, name").order("name"),
+    supabase.from("stores").select("id, name, prefecture, town, address").order("name"),
   ]);
 
   if (!article) {

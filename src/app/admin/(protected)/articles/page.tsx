@@ -7,7 +7,7 @@ export default async function AdminArticlesPage() {
   const supabase = createAdminClient();
   const { data: articles } = await supabase
     .from("articles")
-    .select("*, store:stores(name)")
+    .select("*, store:stores(name, prefecture, town, address)")
     .order("created_at", { ascending: false });
 
   return (
@@ -36,7 +36,16 @@ export default async function AdminArticlesPage() {
           {(articles ?? []).map((article) => (
             <tr key={article.id} className="border-b border-zinc-100">
               <td className="py-2 font-semibold">{article.title}</td>
-              <td>{article.store?.name}</td>
+              <td>
+                {article.store?.name}
+                {article.store && (
+                  <span className="text-zinc-400">
+                    （{article.store.prefecture}
+                    {article.store.town}
+                    {article.store.address}）
+                  </span>
+                )}
+              </td>
               <td>
                 <span
                   className={`rounded-full px-2 py-0.5 text-xs font-semibold ${
