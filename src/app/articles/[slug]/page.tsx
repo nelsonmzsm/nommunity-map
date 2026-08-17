@@ -1,4 +1,3 @@
-import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
@@ -6,6 +5,7 @@ import { createClient } from "@/lib/supabase/server";
 import { parseArticleBody, excerptFromBody } from "@/lib/article-body";
 import IslandBadge from "@/components/IslandBadge";
 import GenreTag from "@/components/GenreTag";
+import ArticlePhotoStrip from "@/components/ArticlePhotoStrip";
 
 async function getArticle(slug: string) {
   const supabase = await createClient();
@@ -58,6 +58,14 @@ export default async function ArticlePage({
   const store = article.store;
   const fullAddress = `${store.prefecture}${store.town}${store.address}`;
   const genreNames = store.store_genres.map((sg: { genre: { name: string } }) => sg.genre.name);
+  const bodySegments = parseArticleBody(article.body);
+  const stripPhotos = Array.from(
+    new Set(
+      [article.cover_photo, ...bodySegments.filter((s) => s.type === "image").map((s) => s.url)].filter(
+        (url): url is string => Boolean(url)
+      )
+    )
+  );
 
   return (
     <div className="flex min-h-dvh flex-col pb-20">
@@ -67,18 +75,7 @@ export default async function ArticlePage({
         </Link>
       </div>
 
-      {article.cover_photo && (
-        <div className="relative h-80 w-full sm:h-[28rem]">
-          <Image
-            src={article.cover_photo}
-            alt={article.title}
-            fill
-            sizes="100vw"
-            className="object-cover"
-            unoptimized
-          />
-        </div>
-      )}
+      <ArticlePhotoStrip photos={stripPhotos} alt={article.title} />
 
       <div className="mx-auto flex w-full max-w-2xl flex-col gap-7 px-4 py-8">
         <div className="flex flex-wrap items-center gap-1.5">
@@ -116,7 +113,7 @@ export default async function ArticlePage({
         </div>
 
         <div className="flex flex-col gap-6">
-          {parseArticleBody(article.body).map((segment, i) =>
+          {bodySegments.map((segment, i) =>
             segment.type === "image" ? (
               // eslint-disable-next-line @next/next/no-img-element -- 元画像の縦横比のまま表示したいため、固定枠+object-coverのnext/image(fill)ではなく素のimgを使う
               <img
