@@ -68,7 +68,7 @@ export default async function ArticlePage({
       </div>
 
       {article.cover_photo && (
-        <div className="relative h-56 w-full sm:h-80">
+        <div className="relative h-80 w-full sm:h-[28rem]">
           <Image
             src={article.cover_photo}
             alt={article.title}
@@ -80,7 +80,7 @@ export default async function ArticlePage({
         </div>
       )}
 
-      <div className="mx-auto flex w-full max-w-2xl flex-col gap-5 px-4 py-6">
+      <div className="mx-auto flex w-full max-w-2xl flex-col gap-7 px-4 py-8">
         <div className="flex flex-wrap items-center gap-1.5">
           <IslandBadge
             region={{
@@ -115,22 +115,17 @@ export default async function ArticlePage({
           </Link>
         </div>
 
-        <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-6">
           {parseArticleBody(article.body).map((segment, i) =>
             segment.type === "image" ? (
-              <div
+              // eslint-disable-next-line @next/next/no-img-element -- 元画像の縦横比のまま表示したいため、固定枠+object-coverのnext/image(fill)ではなく素のimgを使う
+              <img
                 key={i}
-                className="relative h-56 w-full overflow-hidden rounded-xl bg-zinc-100 sm:h-72"
-              >
-                <Image
-                  src={segment.url}
-                  alt={segment.alt || article.title}
-                  fill
-                  sizes="100vw"
-                  className="object-cover"
-                  unoptimized
-                />
-              </div>
+                src={segment.url}
+                alt={segment.alt || article.title}
+                className="w-full rounded-xl bg-zinc-100"
+                loading="lazy"
+              />
             ) : (
               <p
                 key={i}

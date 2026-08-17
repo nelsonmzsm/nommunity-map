@@ -252,10 +252,6 @@ export default function Home() {
           article={articles.find((a) => a.storeId === detailStore.id)}
           onClose={() => setDetailStore(null)}
           onNavigate={openDetail}
-          onOpenSubmit={() => {
-            setDetailStore(null);
-            setSubmitOpen(true);
-          }}
         />
       )}
 

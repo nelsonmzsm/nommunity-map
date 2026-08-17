@@ -16,14 +16,12 @@ export default function StoreDetailModal({
   article,
   onClose,
   onNavigate,
-  onOpenSubmit,
 }: {
   store: Store;
   stores: Store[];
   article?: ArticleSummary;
   onClose: () => void;
   onNavigate: (store: Store) => void;
-  onOpenSubmit: () => void;
 }) {
   const maxPhotos = store.isAd ? 20 : 5;
   const photos = store.photos.slice(0, maxPhotos);
@@ -126,7 +124,7 @@ export default function StoreDetailModal({
             </div>
           )}
 
-          <div className="px-4 pb-4">
+          <div className="px-4 pb-4 pt-4">
             <h2 className="text-2xl font-bold text-zinc-900">{store.name}</h2>
             <div className="mt-1.5 flex flex-wrap gap-1.5">
               {store.genres.map((g) => (
@@ -220,15 +218,16 @@ export default function StoreDetailModal({
                 お店の情報は最新でない可能性があります。ご利用の前に、現在も営業中かご確認ください。
               </p>
               <p className="mt-1.5">
-                本サイトは試験公開中です。掲載情報は、運営者が独自に収集、または提供を受けた店舗情報を元にしています。もし間違いを見つけられた場合は
-                <button
-                  type="button"
-                  onClick={onOpenSubmit}
+                掲載情報は、運営者が独自に収集、または提供を受けた店舗情報を元にしています。もし間違いを見つけられた場合は
+                <a
+                  href="https://nelsonmzsm.github.io/#contact"
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="font-semibold text-zinc-600 underline-offset-2 hover:underline"
                 >
-                  管理者まで
-                </button>
-                お伝えいただけると助かります。
+                  こちら
+                </a>
+                からお知らせいただけると助かります。
               </p>
             </div>
           </div>
