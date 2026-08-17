@@ -94,29 +94,33 @@ export default function StoreDetailModal({
 
         <div className="flex-1 overflow-y-auto">
           {photos.length > 0 ? (
-            <div className="flex gap-1.5 overflow-x-auto p-3">
+            <div className="flex snap-x snap-mandatory overflow-x-auto">
               {photos.map((photo, i) => (
                 <div
                   key={i}
-                  className="relative h-52 w-72 shrink-0 overflow-hidden rounded-xl bg-zinc-100"
+                  className="relative aspect-[3/2] w-full shrink-0 snap-center bg-zinc-100"
                 >
                   <Image
                     src={photo}
                     alt={`${store.name} 写真${i + 1}`}
                     fill
-                    sizes="288px"
+                    sizes="(max-width: 512px) 100vw, 512px"
                     className="object-cover"
                     unoptimized
                   />
+                  {photos.length > 1 && (
+                    <div className="absolute bottom-2 right-2 rounded-full bg-black/50 px-2 py-0.5 text-xs font-semibold text-white">
+                      {i + 1}/{photos.length}
+                    </div>
+                  )}
                 </div>
               ))}
             </div>
           ) : (
-            <div className="h-40 p-3">
+            <div className="aspect-[3/2] w-full">
               <PhotoPlaceholder
                 genres={store.genres}
                 region={store.region}
-                className="rounded-xl"
                 iconClassName="h-12 w-12"
               />
             </div>
