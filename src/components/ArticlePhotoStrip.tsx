@@ -27,6 +27,13 @@ export default function ArticlePhotoStrip({
   const [containerWidth, setContainerWidth] = useState(0);
   const [index, setIndex] = useState(0);
   const [withTransition, setWithTransition] = useState(true);
+  // トップ写真の読み込みが完了して実寸で中央寄せの位置が確定するまでは、
+  // その位置合わせ自体をアニメーションさせない（＝左端→中央のスライドを見せない）。
+  // 未読み込みのimg要素は仮のフォールバック寸法を返すことがあるため、
+  // 幅がわかったかどうかではなく、実際のloadイベントで判定する。
+  const [coverLoaded, setCoverLoaded] = useState(false);
+  const [transitionsEnabled, setTransitionsEnabled] = useState(false);
+  const hasValidCenter = containerWidth > 0 && coverLoaded;
 
   const measure = useCallback(() => {
     const row = rowRef.current;
@@ -50,11 +57,22 @@ export default function ArticlePhotoStrip({
     setContainerWidth((prev) => (prev === cw ? prev : cw));
   }, [photos.length]);
 
+  const handleImageLoad = useCallback(
+    (i: number) => {
+      measure();
+      if (i === 0) setCoverLoaded(true);
+    },
+    [measure]
+  );
+
   useEffect(() => {
     measure();
+    // ブラウザキャッシュ等で既に読み込み済みの場合はloadイベントが
+    // 発火しないため、その場合はここで明示的に完了扱いにする。
+    if (imgRefs.current[0]?.complete) handleImageLoad(0);
     window.addEventListener("resize", measure);
     return () => window.removeEventListener("resize", measure);
-  }, [measure]);
+  }, [measure, handleImageLoad]);
 
   // 3秒ごとに次の写真へ。写真枚数分進んだら（＝複製分の先頭に到達したら）
   // トランジション完了を待ってから、見た目が同じ本来の先頭位置へ
@@ -79,6 +97,12 @@ export default function ArticlePhotoStrip({
     const id = requestAnimationFrame(() => setWithTransition(true));
     return () => cancelAnimationFrame(id);
   }, [withTransition]);
+
+  useEffect(() => {
+    if (!hasValidCenter || transitionsEnabled) return;
+    const id = requestAnimationFrame(() => setTransitionsEnabled(true));
+    return () => cancelAnimationFrame(id);
+  }, [hasValidCenter, transitionsEnabled]);
 
   if (photos.length === 0) return null;
 
@@ -106,7 +130,10 @@ export default function ArticlePhotoStrip({
         className="flex h-full w-max items-center gap-1"
         style={{
           transform: `translateX(${-targetOffset}px)`,
-          transition: withTransition ? `transform ${TRANSITION_MS}ms ${EASING}` : "none",
+          transition:
+            transitionsEnabled && withTransition
+              ? `transform ${TRANSITION_MS}ms ${EASING}`
+              : "none",
         }}
       >
         {photos.map((src, i) => (
@@ -118,7 +145,7 @@ export default function ArticlePhotoStrip({
             }}
             src={src}
             alt={alt}
-            onLoad={measure}
+            onLoad={() => handleImageLoad(i)}
             className="h-full w-auto shrink-0"
           />
         ))}
