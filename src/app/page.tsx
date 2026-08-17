@@ -4,14 +4,12 @@ import { useEffect, useMemo, useState } from "react";
 import Header from "@/components/Header";
 import MobileActionBar from "@/components/MobileActionBar";
 import RecentStoresTicker from "@/components/RecentStoresTicker";
-import RecentArticlesTicker from "@/components/RecentArticlesTicker";
 import SearchFilters from "@/components/SearchFilters";
 import MapView from "@/components/MapView";
 import StoreList from "@/components/StoreList";
 import StoreDetailModal from "@/components/StoreDetailModal";
 import SubmitModal from "@/components/SubmitModal";
 import type { Genre, Region, Store, StoreFilters } from "@/types/store";
-import type { ArticleSummary } from "@/types/article";
 
 const INITIAL_FILTERS: StoreFilters = {
   keyword: "",
@@ -22,7 +20,6 @@ const INITIAL_FILTERS: StoreFilters = {
 
 export default function Home() {
   const [stores, setStores] = useState<Store[]>([]);
-  const [articles, setArticles] = useState<ArticleSummary[]>([]);
   const [genres, setGenres] = useState<Genre[]>([]);
   const [regions, setRegions] = useState<Region[]>([]);
   const [loading, setLoading] = useState(true);
@@ -48,23 +45,20 @@ export default function Home() {
     let cancelled = false;
 
     async function load() {
-      const [storesRes, genresRes, regionsRes, articlesRes] = await Promise.all([
+      const [storesRes, genresRes, regionsRes] = await Promise.all([
         fetch("/api/stores"),
         fetch("/api/genres"),
         fetch("/api/regions"),
-        fetch("/api/articles"),
       ]);
-      const [storesData, genresData, regionsData, articlesData] = await Promise.all([
+      const [storesData, genresData, regionsData] = await Promise.all([
         storesRes.json(),
         genresRes.json(),
         regionsRes.json(),
-        articlesRes.json(),
       ]);
       if (!cancelled) {
         setStores(storesData);
         setGenres(genresData);
         setRegions(regionsData);
-        setArticles(Array.isArray(articlesData) ? articlesData : []);
         setLoading(false);
 
         const storeId = new URLSearchParams(window.location.search).get("store");
@@ -150,7 +144,6 @@ export default function Home() {
     <div className="flex h-dvh flex-col">
       <Header onOpenSubmit={() => setSubmitOpen(true)} />
       <RecentStoresTicker stores={stores} onSelectStore={openDetail} />
-      <RecentArticlesTicker articles={articles} />
       <SearchFilters
         filters={{ ...filters, prefecture: effectivePrefecture }}
         genres={genres}

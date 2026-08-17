@@ -15,7 +15,6 @@ export default async function AdminLayout({
         <nav className="flex gap-4 text-sm font-semibold text-zinc-700">
           <Link href="/admin">ダッシュボード</Link>
           <Link href="/admin/stores">店舗一覧</Link>
-          <Link href="/admin/articles">記事管理</Link>
           <Link href="/admin/submissions">投稿承認</Link>
           <Link href="/admin/genres">ジャンル管理</Link>
           <Link href="/admin/regions">地域管理</Link>
