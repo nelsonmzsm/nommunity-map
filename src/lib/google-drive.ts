@@ -10,10 +10,25 @@ export function isDriveConfigured(): boolean {
   );
 }
 
+// Vercel等のダッシュボードに貼り付ける際、.env.local用の外側の引用符を
+// うっかり含めてしまったり、\n と実改行のどちらで保存されたりが起こりやすいため、
+// どちらの形式でも読めるように正規化する。
+function normalizePrivateKey(raw: string | undefined): string | undefined {
+  if (!raw) return raw;
+  let key = raw.trim();
+  if (
+    (key.startsWith('"') && key.endsWith('"')) ||
+    (key.startsWith("'") && key.endsWith("'"))
+  ) {
+    key = key.slice(1, -1);
+  }
+  return key.includes("\\n") ? key.replace(/\\n/g, "\n") : key;
+}
+
 function getDriveClient() {
   const auth = new google.auth.JWT({
     email: process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL,
-    key: process.env.GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY?.replace(/\\n/g, "\n"),
+    key: normalizePrivateKey(process.env.GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY),
     scopes: ["https://www.googleapis.com/auth/drive"],
   });
   return google.drive({ version: "v3", auth });
