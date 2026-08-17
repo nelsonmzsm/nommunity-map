@@ -4,7 +4,12 @@ import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { requireAdmin } from "@/lib/supabase/require-admin";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { isDriveConfigured, uploadPhotoToDrive } from "@/lib/google-drive";
+import {
+  isDriveConfigured,
+  uploadPhotoToDrive,
+  extractGoogleDocId,
+  exportGoogleDocAsHtml,
+} from "@/lib/google-drive";
 
 const MAX_IMAGE_MB = 5;
 const MAX_IMAGE_BYTES = MAX_IMAGE_MB * 1024 * 1024;
@@ -94,6 +99,39 @@ export async function uploadArticleImageFromUrl(
     return { url };
   } catch (e) {
     return { error: e instanceof Error ? e.message : "アップロードに失敗しました" };
+  }
+}
+
+// 「Google Docsから取り込む」の第1段階。プレビュー確認用にHTMLとタイトルだけ取得する
+// （この時点では画像のアップロードや本文への反映は行わない）。
+export async function fetchGoogleDocForImport(
+  docUrl: string
+): Promise<{ title?: string; html?: string; error?: string }> {
+  await requireAdmin();
+
+  if (!isDriveConfigured()) {
+    return { error: "Google連携（サービスアカウント）が未設定です" };
+  }
+
+  const docId = extractGoogleDocId(docUrl);
+  if (!docId) {
+    return { error: "Google DocのURLが正しくありません" };
+  }
+
+  try {
+    const { title, html } = await exportGoogleDocAsHtml(docId);
+    return { title, html };
+  } catch (e) {
+    const message = e instanceof Error ? e.message : "取得に失敗しました";
+    if (message.includes("403") || message.toLowerCase().includes("permission")) {
+      return {
+        error:
+          "このドキュメントを読み取れませんでした。サービスアカウント（" +
+          process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL +
+          "）に閲覧権限を共有してください。",
+      };
+    }
+    return { error: message };
   }
 }
 

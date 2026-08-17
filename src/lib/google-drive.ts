@@ -45,3 +45,28 @@ export async function uploadPhotoToDrive(file: File): Promise<string> {
 
   return `https://drive.google.com/uc?export=view&id=${fileId}`;
 }
+
+// Google DocのURLからドキュIDを取り出す（/document/d/{id}/... の形式）。
+export function extractGoogleDocId(url: string): string | null {
+  const match = url.match(/\/document\/d\/([a-zA-Z0-9_-]+)/);
+  return match ? match[1] : null;
+}
+
+// 記事本文への「Google Docs取り込み」用。指定ドキュメントをHTMLとしてエクスポートする。
+// ドキュメント側で、このサービスアカウント（GOOGLE_SERVICE_ACCOUNT_EMAIL）に
+// 閲覧権限を共有しておく必要がある。画像は原則データURLとして埋め込まれた形で返る。
+export async function exportGoogleDocAsHtml(
+  docId: string
+): Promise<{ title: string; html: string }> {
+  const drive = getDriveClient();
+
+  const [meta, exported] = await Promise.all([
+    drive.files.get({ fileId: docId, fields: "name" }),
+    drive.files.export({ fileId: docId, mimeType: "text/html" }, { responseType: "text" }),
+  ]);
+
+  return {
+    title: meta.data.name ?? "",
+    html: exported.data as string,
+  };
+}
