@@ -6,7 +6,7 @@ export async function GET() {
   const supabase = await createClient();
   const { data, error } = await supabase
     .from("stores")
-    .select("*, store_genres(genre:genres(*)), region:regions(*)")
+    .select("*, store_genres(genre:genres(*)), region:regions(*), articles(slug, status)")
     .eq("status", "published");
 
   if (error) {
@@ -41,6 +41,7 @@ export async function GET() {
     providerNote: s.provider_note ?? undefined,
     verified: s.verified,
     createdAt: s.created_at,
+    articleSlug: s.articles?.status === "published" ? s.articles.slug : undefined,
   }));
 
   return NextResponse.json(stores);

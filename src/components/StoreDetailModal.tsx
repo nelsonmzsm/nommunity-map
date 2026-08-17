@@ -1,7 +1,8 @@
 "use client";
 
 import Image from "next/image";
-import { ChevronLeft, ChevronRight, Search } from "lucide-react";
+import Link from "next/link";
+import { ChevronLeft, ChevronRight, Search, Newspaper } from "lucide-react";
 import type { Store } from "@/types/store";
 import IslandBadge from "./IslandBadge";
 import GenreTag from "./GenreTag";
@@ -119,6 +120,17 @@ export default function StoreDetailModal({
           )}
 
           <div className="px-4 pb-4">
+            {store.articleSlug && (
+              <Link
+                href={`/articles/${store.articleSlug}`}
+                className="mb-3 flex items-center gap-2 rounded-xl px-4 py-3 text-sm font-bold text-white shadow-sm"
+                style={{ backgroundColor: store.region.color }}
+              >
+                <Newspaper className="h-5 w-5 shrink-0" />
+                運営が取材した記事を読む
+              </Link>
+            )}
+
             <h2 className="text-2xl font-bold text-zinc-900">{store.name}</h2>
             <div className="mt-1.5 flex flex-wrap gap-1.5">
               {store.genres.map((g) => (

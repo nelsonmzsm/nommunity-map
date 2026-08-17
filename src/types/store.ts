@@ -33,6 +33,7 @@ export interface Store {
   providerNote?: string; // 情報提供者に関するメモ。店舗詳細画面に公開表示
   verified: boolean; // 運営による裏取り確認済みか
   createdAt: string; // 掲載日時（ISO文字列）
+  articleSlug?: string; // 運営取材記事のスラッグ（あれば）
 }
 
 export interface StoreFilters {
