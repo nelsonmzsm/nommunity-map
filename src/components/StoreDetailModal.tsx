@@ -1,8 +1,10 @@
 "use client";
 
 import Image from "next/image";
-import { ChevronLeft, ChevronRight, Search } from "lucide-react";
+import Link from "next/link";
+import { ChevronLeft, ChevronRight, Search, Newspaper } from "lucide-react";
 import type { Store } from "@/types/store";
+import type { ArticleSummary } from "@/types/article";
 import IslandBadge from "./IslandBadge";
 import GenreTag from "./GenreTag";
 import PhotoPlaceholder from "./PhotoPlaceholder";
@@ -11,12 +13,14 @@ import VerifiedBadge from "./VerifiedBadge";
 export default function StoreDetailModal({
   store,
   stores,
+  article,
   onClose,
   onNavigate,
   onOpenSubmit,
 }: {
   store: Store;
   stores: Store[];
+  article?: ArticleSummary;
   onClose: () => void;
   onNavigate: (store: Store) => void;
   onOpenSubmit: () => void;
@@ -153,6 +157,25 @@ export default function StoreDetailModal({
               <p className="mt-2 text-sm text-zinc-500">
                 情報提供: {store.providerNote}
               </p>
+            )}
+
+            {article && (
+              <div className="mt-4">
+                <div className="relative max-h-20 overflow-hidden">
+                  <p className="whitespace-pre-wrap text-base leading-relaxed text-zinc-800">
+                    {article.excerpt}
+                  </p>
+                  <div className="pointer-events-none absolute inset-x-0 bottom-0 h-14 bg-gradient-to-t from-[#F6F2EA] to-transparent" />
+                </div>
+                <Link
+                  href={`/articles/${article.slug}`}
+                  className="mt-1 flex items-center justify-center gap-1.5 rounded-full py-2.5 text-sm font-bold text-white"
+                  style={{ backgroundColor: store.region.color }}
+                >
+                  <Newspaper className="h-4 w-4" />
+                  記事を読む
+                </Link>
+              </div>
             )}
 
             <div className="mt-5 flex flex-col gap-3 sm:flex-row">

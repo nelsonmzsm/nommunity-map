@@ -4,12 +4,14 @@ import { useEffect, useMemo, useState } from "react";
 import Header from "@/components/Header";
 import MobileActionBar from "@/components/MobileActionBar";
 import RecentStoresTicker from "@/components/RecentStoresTicker";
+import RecentArticlesTicker from "@/components/RecentArticlesTicker";
 import SearchFilters from "@/components/SearchFilters";
 import MapView from "@/components/MapView";
 import StoreList from "@/components/StoreList";
 import StoreDetailModal from "@/components/StoreDetailModal";
 import SubmitModal from "@/components/SubmitModal";
 import type { Genre, Region, Store, StoreFilters } from "@/types/store";
+import type { ArticleSummary } from "@/types/article";
 
 const INITIAL_FILTERS: StoreFilters = {
   keyword: "",
@@ -20,6 +22,7 @@ const INITIAL_FILTERS: StoreFilters = {
 
 export default function Home() {
   const [stores, setStores] = useState<Store[]>([]);
+  const [articles, setArticles] = useState<ArticleSummary[]>([]);
   const [genres, setGenres] = useState<Genre[]>([]);
   const [regions, setRegions] = useState<Region[]>([]);
   const [loading, setLoading] = useState(true);
@@ -73,6 +76,21 @@ export default function Home() {
     }
 
     load();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  // 記事機能は本体の店舗表示とは独立させ、取得に失敗しても
+  // 地図・店舗一覧には一切影響しないようにする（記事欄が出ないだけになる）。
+  useEffect(() => {
+    let cancelled = false;
+    fetch("/api/articles")
+      .then((res) => (res.ok ? res.json() : []))
+      .then((data) => {
+        if (!cancelled && Array.isArray(data)) setArticles(data);
+      })
+      .catch(() => {});
     return () => {
       cancelled = true;
     };
@@ -144,6 +162,7 @@ export default function Home() {
     <div className="flex h-dvh flex-col">
       <Header onOpenSubmit={() => setSubmitOpen(true)} />
       <RecentStoresTicker stores={stores} onSelectStore={openDetail} />
+      <RecentArticlesTicker articles={articles} />
       <SearchFilters
         filters={{ ...filters, prefecture: effectivePrefecture }}
         genres={genres}
@@ -200,6 +219,7 @@ export default function Home() {
         <StoreDetailModal
           store={detailStore}
           stores={filteredStores}
+          article={articles.find((a) => a.storeId === detailStore.id)}
           onClose={() => setDetailStore(null)}
           onNavigate={openDetail}
           onOpenSubmit={() => {

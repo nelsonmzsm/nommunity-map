@@ -53,6 +53,21 @@ type StoreGenreRow = {
   genre_id: string;
 };
 
+type ArticleRow = {
+  id: string;
+  store_id: string;
+  slug: string;
+  title: string;
+  cover_photo: string | null;
+  photos: string[];
+  body: string;
+  status: "draft" | "published";
+  view_count: number;
+  published_at: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
 type StoreSubmissionRow = {
   id: string;
   target_store_id: string | null;
@@ -132,6 +147,20 @@ export type Database = {
           }
         ];
       };
+      articles: {
+        Row: ArticleRow;
+        Insert: Partial<ArticleRow>;
+        Update: Partial<ArticleRow>;
+        Relationships: [
+          {
+            foreignKeyName: "articles_store_id_fkey";
+            columns: ["store_id"];
+            isOneToOne: true;
+            referencedRelation: "stores";
+            referencedColumns: ["id"];
+          }
+        ];
+      };
       store_submissions: {
         Row: StoreSubmissionRow;
         Insert: Partial<StoreSubmissionRow>;
@@ -159,6 +188,10 @@ export type Database = {
       approve_submission: {
         Args: { submission_id: string; reviewer_id?: string | null };
         Returns: string;
+      };
+      increment_article_view_count: {
+        Args: { article_id: string };
+        Returns: void;
       };
     };
   };
