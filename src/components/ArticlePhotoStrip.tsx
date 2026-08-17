@@ -22,8 +22,9 @@ export default function ArticlePhotoStrip({
   const containerRef = useRef<HTMLDivElement>(null);
   const rowRef = useRef<HTMLDivElement>(null);
   const imgRefs = useRef<(HTMLImageElement | null)[]>([]);
+  const loopStartRef = useRef<HTMLImageElement | null>(null);
   const [positions, setPositions] = useState<Position[]>([]);
-  const [segmentWidth, setSegmentWidth] = useState(0);
+  const [loopOffset, setLoopOffset] = useState(0);
   const [containerWidth, setContainerWidth] = useState(0);
   const [index, setIndex] = useState(0);
   const [withTransition, setWithTransition] = useState(true);
@@ -51,8 +52,10 @@ export default function ArticlePhotoStrip({
         ? prev
         : next
     );
-    const total = row.scrollWidth / 2;
-    setSegmentWidth((prev) => (prev === total ? prev : total));
+    if (loopStartRef.current) {
+      const loop = loopStartRef.current.getBoundingClientRect().left - rowLeft;
+      setLoopOffset((prev) => (prev === loop ? prev : loop));
+    }
     const cw = container.clientWidth;
     setContainerWidth((prev) => (prev === cw ? prev : cw));
   }, [photos.length]);
@@ -119,8 +122,7 @@ export default function ArticlePhotoStrip({
   // オフセットしておく（以降のステップもこの分だけ均等にずらしたまま進む）。
   const centerOffset =
     containerWidth && positions[0] ? (containerWidth - positions[0].width) / 2 : 0;
-  const rawOffset =
-    index === photos.length ? segmentWidth + (positions[0]?.left ?? 0) : (positions[index]?.left ?? 0);
+  const rawOffset = index === photos.length ? loopOffset : (positions[index]?.left ?? 0);
   const targetOffset = rawOffset - centerOffset;
 
   return (
@@ -136,6 +138,11 @@ export default function ArticlePhotoStrip({
               : "none",
         }}
       >
+        {/* 初期表示（先頭写真を中央配置）で左端が空白にならないよう、
+            末尾の写真を装飾として先頭にも置いておく。 */}
+        {/* eslint-disable-next-line @next/next/no-img-element -- 左端の余白埋め用の装飾複製 */}
+        <img src={photos[photos.length - 1]} alt="" aria-hidden className="h-full w-auto shrink-0" />
+
         {photos.map((src, i) => (
           // eslint-disable-next-line @next/next/no-img-element -- 元の縦横比のまま表示したいため素のimgを使う
           <img
@@ -151,7 +158,14 @@ export default function ArticlePhotoStrip({
         ))}
         {photos.map((src, i) => (
           // eslint-disable-next-line @next/next/no-img-element -- 無限ループ用の複製（装飾目的なのでaria-hidden）
-          <img key={`b-${i}`} src={src} alt="" aria-hidden className="h-full w-auto shrink-0" />
+          <img
+            key={`b-${i}`}
+            ref={i === 0 ? loopStartRef : undefined}
+            src={src}
+            alt=""
+            aria-hidden
+            className="h-full w-auto shrink-0"
+          />
         ))}
       </div>
     </div>
