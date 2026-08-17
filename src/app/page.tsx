@@ -4,10 +4,10 @@ import { useEffect, useMemo, useState } from "react";
 import Header from "@/components/Header";
 import MobileActionBar from "@/components/MobileActionBar";
 import RecentStoresTicker from "@/components/RecentStoresTicker";
-import RecentArticlesTicker from "@/components/RecentArticlesTicker";
 import SearchFilters from "@/components/SearchFilters";
 import MapView from "@/components/MapView";
 import StoreList from "@/components/StoreList";
+import ArticleList from "@/components/ArticleList";
 import StoreDetailModal from "@/components/StoreDetailModal";
 import SubmitModal from "@/components/SubmitModal";
 import type { Genre, Region, Store, StoreFilters } from "@/types/store";
@@ -27,7 +27,7 @@ export default function Home() {
   const [regions, setRegions] = useState<Region[]>([]);
   const [loading, setLoading] = useState(true);
   const [filters, setFilters] = useState<StoreFilters>(INITIAL_FILTERS);
-  const [mobileView, setMobileView] = useState<"map" | "list">("map");
+  const [activePanel, setActivePanel] = useState<"map" | "list" | "articles">("map");
   const [selectedStoreId, setSelectedStoreId] = useState<string | null>(null);
   const [detailStore, setDetailStore] = useState<Store | null>(null);
   const [submitOpen, setSubmitOpen] = useState(false);
@@ -162,15 +162,14 @@ export default function Home() {
     <div className="flex h-dvh flex-col">
       <Header onOpenSubmit={() => setSubmitOpen(true)} />
       <RecentStoresTicker stores={stores} onSelectStore={openDetail} />
-      <RecentArticlesTicker articles={articles} />
       <SearchFilters
         filters={{ ...filters, prefecture: effectivePrefecture }}
         genres={genres}
         regions={regions}
         prefectureOptions={prefectureOptions}
         onChange={setFilters}
-        view={mobileView}
-        onChangeView={setMobileView}
+        view={activePanel}
+        onChangeView={setActivePanel}
         shownCount={filteredStores.length}
         totalCount={stores.length}
         filtersOpen={filtersOpen}
@@ -180,7 +179,7 @@ export default function Home() {
       <div className="relative flex flex-1 overflow-hidden">
         <div
           className={`h-full w-full flex-1 sm:block ${
-            mobileView === "map" ? "block" : "hidden"
+            activePanel === "map" ? "block" : "hidden"
           }`}
         >
           {loading ? (
@@ -200,16 +199,47 @@ export default function Home() {
         </div>
 
         <div
-          className={`h-full w-full shrink-0 border-zinc-200 sm:block sm:w-1/2 sm:border-l lg:w-96 ${
-            mobileView === "list" ? "block" : "hidden"
+          className={`h-full w-full shrink-0 flex-col border-zinc-200 sm:flex sm:w-1/2 sm:border-l lg:w-96 ${
+            activePanel === "list" || activePanel === "articles" ? "flex" : "hidden"
           }`}
         >
-          <StoreList
-            stores={filteredStores}
-            selectedStoreId={selectedStoreId}
-            onSelectStore={(store) => selectStore(store.id)}
-            onOpenDetail={openDetail}
-          />
+          <div className="hidden shrink-0 border-b border-zinc-200 sm:flex">
+            <button
+              type="button"
+              onClick={() => setActivePanel("list")}
+              className={`flex-1 border-b-2 px-4 py-2.5 text-sm font-semibold transition-colors ${
+                activePanel === "articles"
+                  ? "border-transparent text-zinc-400 hover:text-zinc-600"
+                  : "border-zinc-900 text-zinc-900"
+              }`}
+            >
+              お店一覧
+            </button>
+            <button
+              type="button"
+              onClick={() => setActivePanel("articles")}
+              className={`flex-1 border-b-2 px-4 py-2.5 text-sm font-semibold transition-colors ${
+                activePanel === "articles"
+                  ? "border-zinc-900 text-zinc-900"
+                  : "border-transparent text-zinc-400 hover:text-zinc-600"
+              }`}
+            >
+              訪問記事一覧
+            </button>
+          </div>
+
+          <div className="min-h-0 flex-1">
+            {activePanel === "articles" ? (
+              <ArticleList articles={articles} />
+            ) : (
+              <StoreList
+                stores={filteredStores}
+                selectedStoreId={selectedStoreId}
+                onSelectStore={(store) => selectStore(store.id)}
+                onOpenDetail={openDetail}
+              />
+            )}
+          </div>
         </div>
       </div>
 

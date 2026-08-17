@@ -11,8 +11,8 @@ interface SearchFiltersProps {
   regions: Region[];
   prefectureOptions: PrefectureOption[];
   onChange: (filters: StoreFilters) => void;
-  view: "map" | "list";
-  onChangeView: (view: "map" | "list") => void;
+  view: "map" | "list" | "articles";
+  onChangeView: (view: "map" | "list" | "articles") => void;
   shownCount: number;
   totalCount: number;
   filtersOpen: boolean;
@@ -123,6 +123,15 @@ export default function SearchFilters({
           }`}
         >
           リスト
+        </button>
+        <button
+          type="button"
+          onClick={() => onChangeView("articles")}
+          className={`flex-1 rounded-full px-4 py-1.5 text-sm font-semibold ${
+            view === "articles" ? "bg-zinc-900 text-white" : "text-zinc-600"
+          }`}
+        >
+          訪問記事
         </button>
       </div>
 
