@@ -53,6 +53,50 @@ export async function uploadArticleImage(
   }
 }
 
+// Google Docs等からのコピペで本文に紛れ込む画像URL（例:
+// googleusercontent.com）は、ブラウザから直接fetchするとCORSで弾かれることが
+// 多いため、サーバー側で取得してDriveへ保存し直す。
+export async function uploadArticleImageFromUrl(
+  sourceUrl: string
+): Promise<{ url?: string; error?: string }> {
+  await requireAdmin();
+
+  if (!isDriveConfigured()) {
+    return { error: "画像アップロード先（Google Drive）が未設定です" };
+  }
+
+  let parsed: URL;
+  try {
+    parsed = new URL(sourceUrl);
+  } catch {
+    return { error: "画像URLが不正です" };
+  }
+  if (parsed.protocol !== "http:" && parsed.protocol !== "https:") {
+    return { error: "画像URLが不正です" };
+  }
+
+  try {
+    const res = await fetch(parsed.toString());
+    if (!res.ok) {
+      return { error: `画像の取得に失敗しました（${res.status}）` };
+    }
+    const contentType = res.headers.get("content-type") ?? "image/png";
+    if (!contentType.startsWith("image/")) {
+      return { error: "画像を取得できませんでした" };
+    }
+    const buffer = await res.arrayBuffer();
+    if (buffer.byteLength > MAX_IMAGE_BYTES) {
+      return { error: `画像は${MAX_IMAGE_MB}MBまでです` };
+    }
+    const ext = contentType.split("/")[1]?.split(/[+;]/)[0] || "png";
+    const file = new File([buffer], `pasted_${Date.now()}.${ext}`, { type: contentType });
+    const url = await uploadPhotoToDrive(file);
+    return { url };
+  } catch (e) {
+    return { error: e instanceof Error ? e.message : "アップロードに失敗しました" };
+  }
+}
+
 export async function createArticle(formData: FormData) {
   await requireAdmin();
   const supabase = createAdminClient();
