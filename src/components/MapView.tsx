@@ -236,7 +236,7 @@ export default function MapView({
               >
                 <div className="flex flex-col items-center">
                   {photo && (
-                    <div className="mb-0.5 h-8 w-8 shrink-0 overflow-hidden rounded-full border-2 border-white shadow-md">
+                    <div className="mb-1 h-12 w-12 shrink-0 overflow-hidden rounded-full border-2 border-white shadow-md">
                       {/* eslint-disable-next-line @next/next/no-img-element -- 地図マーカー上の小さなサムネイル表示 */}
                       <img src={photo} alt="" className="h-full w-full object-cover" />
                     </div>
