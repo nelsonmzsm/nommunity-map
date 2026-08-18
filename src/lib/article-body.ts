@@ -27,5 +27,6 @@ export function parseArticleBody(body: string): ArticleBodySegment[] {
 }
 
 export function excerptFromBody(body: string, length: number): string {
-  return body.replace(IMAGE_MARKDOWN_RE, "").trim().slice(0, length);
+  const text = body.replace(IMAGE_MARKDOWN_RE, "").replace(/\s+/g, " ").trim();
+  return text.slice(0, length);
 }

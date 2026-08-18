@@ -5,7 +5,6 @@ import {
   APIProvider,
   Map,
   AdvancedMarker,
-  Pin,
   InfoWindow,
   useMap,
 } from "@vis.gl/react-google-maps";
@@ -100,6 +99,33 @@ function MapLegend({ regions }: { regions: Region[] }) {
         </div>
       )}
     </div>
+  );
+}
+
+// 写真サムネイルをピンの上に重ねて表示したいため、ライブラリの<Pin>
+// （内部でDOMに直接アタッチする特殊な仕組みのため、カスタムのラッパー要素の
+// 子として使うと正しく表示されない）は使わず、同等の見た目をSVGで自作する。
+function MarkerPinIcon({
+  background,
+  borderColor,
+  scale,
+}: {
+  background: string;
+  borderColor: string;
+  scale: number;
+}) {
+  const width = 27 * scale;
+  const height = 37 * scale;
+  return (
+    <svg width={width} height={height} viewBox="0 0 27 37" xmlns="http://www.w3.org/2000/svg">
+      <path
+        d="M13.5 0C6.04 0 0 6.04 0 13.5 0 24 13.5 37 13.5 37S27 24 27 13.5C27 6.04 20.96 0 13.5 0z"
+        fill={background}
+        stroke={borderColor}
+        strokeWidth={1.5}
+      />
+      <circle cx="13.5" cy="13.5" r="5.5" fill="#ffffff" />
+    </svg>
   );
 }
 
@@ -200,20 +226,30 @@ export default function MapView({
           />
           <FilteredStoresFocuser active={hasActiveFilter} stores={stores} />
 
-          {stores.map((store) => (
-            <AdvancedMarker
-              key={store.id}
-              position={{ lat: store.lat, lng: store.lng }}
-              onClick={() => onSelectStore(store.id)}
-            >
-              <Pin
-                background={store.region.color}
-                borderColor={store.region.colorBorder}
-                glyphColor="#ffffff"
-                scale={store.id === selectedStoreId ? 1.9 : 1.5}
-              />
-            </AdvancedMarker>
-          ))}
+          {stores.map((store) => {
+            const photo = store.photos[0];
+            return (
+              <AdvancedMarker
+                key={store.id}
+                position={{ lat: store.lat, lng: store.lng }}
+                onClick={() => onSelectStore(store.id)}
+              >
+                <div className="flex flex-col items-center">
+                  {photo && (
+                    <div className="mb-0.5 h-8 w-8 shrink-0 overflow-hidden rounded-full border-2 border-white shadow-md">
+                      {/* eslint-disable-next-line @next/next/no-img-element -- 地図マーカー上の小さなサムネイル表示 */}
+                      <img src={photo} alt="" className="h-full w-full object-cover" />
+                    </div>
+                  )}
+                  <MarkerPinIcon
+                    background={store.region.color}
+                    borderColor={store.region.colorBorder}
+                    scale={store.id === selectedStoreId ? 1.9 : 1.5}
+                  />
+                </div>
+              </AdvancedMarker>
+            );
+          })}
 
           {selectedStore && (
             <InfoWindow
