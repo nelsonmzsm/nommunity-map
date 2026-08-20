@@ -5,6 +5,7 @@ import {
   APIProvider,
   Map,
   AdvancedMarker,
+  AdvancedMarkerAnchorPoint,
   InfoWindow,
   useMap,
 } from "@vis.gl/react-google-maps";
@@ -228,25 +229,33 @@ export default function MapView({
 
           {stores.map((store) => {
             const photo = store.photos[0];
+            const scale = store.id === selectedStoreId ? 1.9 : 1.5;
             return (
               <AdvancedMarker
                 key={store.id}
                 position={{ lat: store.lat, lng: store.lng }}
                 onClick={() => onSelectStore(store.id)}
+                anchorPoint={photo ? AdvancedMarkerAnchorPoint.CENTER : undefined}
               >
-                <div className="flex flex-col items-center">
-                  {photo && (
-                    <div className="mb-1 h-12 w-12 shrink-0 overflow-hidden rounded-full border-2 border-white shadow-md">
-                      {/* eslint-disable-next-line @next/next/no-img-element -- 地図マーカー上の小さなサムネイル表示 */}
-                      <img src={photo} alt="" className="h-full w-full object-cover" />
-                    </div>
-                  )}
+                {photo ? (
+                  <div
+                    className="overflow-hidden rounded-full shadow-md"
+                    style={{
+                      width: 32 * scale,
+                      height: 32 * scale,
+                      border: `3px solid ${store.region.color}`,
+                    }}
+                  >
+                    {/* eslint-disable-next-line @next/next/no-img-element -- 地図マーカーのアイコン表示 */}
+                    <img src={photo} alt="" className="h-full w-full object-cover" />
+                  </div>
+                ) : (
                   <MarkerPinIcon
                     background={store.region.color}
                     borderColor={store.region.colorBorder}
-                    scale={store.id === selectedStoreId ? 1.9 : 1.5}
+                    scale={scale}
                   />
-                </div>
+                )}
               </AdvancedMarker>
             );
           })}
