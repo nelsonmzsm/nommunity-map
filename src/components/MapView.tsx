@@ -130,6 +130,51 @@ function MarkerPinIcon({
   );
 }
 
+// ピンの代わりに、デフォルメした島の形のシルエットを島の色で塗って表示する。
+// 元画像は黒シルエット＋透過背景のPNGのため、CSSのmask-imageで型抜きして
+// 色だけ region.color に差し替えている。
+const ISLAND_SHAPE_KEYS = new Set([
+  "amami",
+  "kikai",
+  "kakeroma",
+  "yoro",
+  "uke",
+  "tokunoshima",
+  "okinoerabu",
+  "yoron",
+]);
+
+function MarkerIslandIcon({
+  regionKey,
+  color,
+  scale,
+}: {
+  regionKey: string;
+  color: string;
+  scale: number;
+}) {
+  const size = 40 * scale;
+  const maskImage = `url(/islands/${regionKey}.png)`;
+  return (
+    <div
+      style={{
+        width: size,
+        height: size,
+        backgroundColor: color,
+        WebkitMaskImage: maskImage,
+        maskImage,
+        WebkitMaskSize: "contain",
+        maskSize: "contain",
+        WebkitMaskRepeat: "no-repeat",
+        maskRepeat: "no-repeat",
+        WebkitMaskPosition: "center",
+        maskPosition: "center",
+        filter: "drop-shadow(0 1px 2px rgba(0,0,0,0.4))",
+      }}
+    />
+  );
+}
+
 interface MapViewProps {
   stores: Store[];
   regions: Region[];
@@ -235,7 +280,7 @@ export default function MapView({
                 key={store.id}
                 position={{ lat: store.lat, lng: store.lng }}
                 onClick={() => onSelectStore(store.id)}
-                anchorPoint={photo ? AdvancedMarkerAnchorPoint.CENTER : undefined}
+                anchorPoint={AdvancedMarkerAnchorPoint.CENTER}
               >
                 {photo ? (
                   <div
@@ -249,6 +294,12 @@ export default function MapView({
                     {/* eslint-disable-next-line @next/next/no-img-element -- 地図マーカーのアイコン表示 */}
                     <img src={photo} alt="" className="h-full w-full object-cover" />
                   </div>
+                ) : ISLAND_SHAPE_KEYS.has(store.region.key) ? (
+                  <MarkerIslandIcon
+                    regionKey={store.region.key}
+                    color={store.region.color}
+                    scale={scale}
+                  />
                 ) : (
                   <MarkerPinIcon
                     background={store.region.color}
