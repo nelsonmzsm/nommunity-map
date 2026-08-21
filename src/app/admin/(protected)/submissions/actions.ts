@@ -19,7 +19,11 @@ export async function approveSubmission(id: string) {
       .eq("id", id)
       .single();
 
-    const fullAddress = `${submission?.prefecture ?? ""}${submission?.town ?? ""}${submission?.address ?? ""}`.trim();
+    // 「海外」は実在の地名ではないため、ジオコーディング対象の文字列には含めない
+    // （国名を含めた住所は投稿者がaddressにすべて入力している前提）。
+    const prefecturePart = submission?.prefecture === "海外" ? "" : (submission?.prefecture ?? "");
+    const townPart = submission?.prefecture === "海外" ? "" : (submission?.town ?? "");
+    const fullAddress = `${prefecturePart}${townPart}${submission?.address ?? ""}`.trim();
     if (fullAddress) {
       const coords = await geocodeAddress(fullAddress);
       if (coords) {

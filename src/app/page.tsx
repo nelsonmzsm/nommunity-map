@@ -32,6 +32,15 @@ export default function Home() {
   const [detailStore, setDetailStore] = useState<Store | null>(null);
   const [submitOpen, setSubmitOpen] = useState(false);
   const [filtersOpen, setFiltersOpen] = useState(false);
+  // 初回表示（現在地centeringを尊重したい）と、ユーザーが一度でも
+  // 絞り込み条件を操作した後（「すべて」に戻した場合も含む）とで、
+  // 地図の自動フォーカス挙動を区別するためのフラグ。
+  const [filtersTouched, setFiltersTouched] = useState(false);
+
+  const handleFiltersChange = (next: StoreFilters) => {
+    setFiltersTouched(true);
+    setFilters(next);
+  };
 
   const selectStore = (id: string | null) => {
     setSelectedStoreId(id);
@@ -156,7 +165,10 @@ export default function Home() {
   // 大きく縮んでいるため、その間はfitBounds等のフォーカス処理を
   // 実行しない（誤ったズームになるのを防ぐ）。パネルを閉じた瞬間に
   // 改めてフォーカスさせる。
-  const shouldFocusMap = hasActiveFilter && !filtersOpen;
+  // filtersTouchedも条件に含めることで、「都道府県：すべて」に戻すなど
+  // 絞り込みをすべて解除した操作の直後も、現在地centeringのままにせず
+  // 表示中の店舗（＝全国）に合わせて地図を再フォーカスさせる。
+  const shouldFocusMap = (hasActiveFilter || filtersTouched) && !filtersOpen;
 
   return (
     <div className="flex h-dvh flex-col">

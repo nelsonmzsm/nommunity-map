@@ -19,6 +19,7 @@ const INITIAL_STATE: SubmitState = { status: "idle" };
 const OTHER_GENRE_NAME = "その他の飲食店";
 const UNCONFIRMED_REGION_NAME = "未確認";
 const PREFECTURES = Object.keys(prefectureCities);
+const OVERSEAS = "海外";
 const MAX_PHOTO_MB = 5;
 const MAX_PHOTO_BYTES = MAX_PHOTO_MB * 1024 * 1024;
 
@@ -32,7 +33,8 @@ export default function SubmitForm({ genres, regions, stores }: SubmitFormProps)
   const selectableRegions = regions.filter((r) => r.name !== UNCONFIRMED_REGION_NAME);
   const otherGenre = genres.find((g) => g.name === OTHER_GENRE_NAME);
   const isOtherGenre = otherGenre != null && genreIds.includes(otherGenre.id);
-  const cities: string[] = prefecture
+  const isOverseas = prefecture === OVERSEAS;
+  const cities: string[] = prefecture && !isOverseas
     ? (prefectureCities as Record<string, string[]>)[prefecture] ?? []
     : [];
   const oversizedPhotos = photoFiles.filter((f) => f.size > MAX_PHOTO_BYTES);
@@ -178,17 +180,20 @@ export default function SubmitForm({ genres, regions, stores }: SubmitFormProps)
                 {p}
               </option>
             ))}
+            <option value={OVERSEAS}>{OVERSEAS}</option>
           </select>
         </label>
         <label className="flex flex-col gap-1 text-sm">
           市区町村
           <select
             name="town"
-            required={kind === "new"}
-            disabled={!prefecture}
+            required={kind === "new" && !isOverseas}
+            disabled={!prefecture || isOverseas}
             className="rounded-lg border border-zinc-300 bg-white px-3 py-2 disabled:bg-zinc-100"
           >
-            <option value="">{prefecture ? "選択してください" : "都道府県を先に選択"}</option>
+            <option value="">
+              {isOverseas ? "該当なし" : prefecture ? "選択してください" : "都道府県を先に選択"}
+            </option>
             {cities.map((city) => (
               <option key={city} value={city}>
                 {city}
@@ -206,6 +211,11 @@ export default function SubmitForm({ genres, regions, stores }: SubmitFormProps)
           required={kind === "new"}
           className="rounded-lg border border-zinc-300 bg-white px-3 py-2"
         />
+        {isOverseas && (
+          <span className="text-xs font-semibold text-amber-600">
+            住所に国名も含めてご入力ください
+          </span>
+        )}
       </label>
 
       <label className="flex flex-col gap-1 text-sm">
