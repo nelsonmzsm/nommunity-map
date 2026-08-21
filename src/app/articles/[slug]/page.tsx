@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
 import { parseArticleBody, excerptFromBody } from "@/lib/article-body";
+import { formatFullAddress } from "@/lib/address";
 import IslandBadge from "@/components/IslandBadge";
 import GenreTag from "@/components/GenreTag";
 import ArticlePhotoStrip from "@/components/ArticlePhotoStrip";
@@ -56,7 +57,7 @@ export default async function ArticlePage({
   await supabase.rpc("increment_article_view_count", { article_id: article.id });
 
   const store = article.store;
-  const fullAddress = `${store.prefecture}${store.town}${store.address}`;
+  const fullAddress = formatFullAddress(store);
   const genreNames = store.store_genres.map((sg: { genre: { name: string } }) => sg.genre.name);
   const bodySegments = parseArticleBody(article.body);
   const stripPhotos = Array.from(

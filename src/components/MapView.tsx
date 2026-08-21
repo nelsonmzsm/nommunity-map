@@ -49,12 +49,19 @@ function FilteredStoresFocuser({
   useEffect(() => {
     if (!map || !active || stores.length === 0) return;
 
+    // 「海外」の店舗は地理的に大きく離れているため、自動フォーカス用の
+    // 範囲計算に含めると（例:日本全体を見せたいだけなのに）太平洋を
+    // 挟んで極端に引いた表示になってしまう。ズーム計算からは除外し、
+    // 国内の店舗が1件もない場合だけ海外店舗も含めてフォールバックする。
+    const domesticStores = stores.filter((store) => store.prefecture !== "海外");
+    const focusStores = domesticStores.length > 0 ? domesticStores : stores;
+
     // 地図コンテナのサイズがレイアウト確定前だと fitBounds が
     // 誤った（極端に引いた）ズームを計算することがあるため、
     // 1フレーム待ってから実行する。
     const frame = requestAnimationFrame(() => {
-      if (stores.length === 1) {
-        map.panTo({ lat: stores[0].lat, lng: stores[0].lng });
+      if (focusStores.length === 1) {
+        map.panTo({ lat: focusStores[0].lat, lng: focusStores[0].lng });
         if ((map.getZoom() ?? 0) < SELECTED_STORE_PAN_ZOOM) {
           map.setZoom(SELECTED_STORE_PAN_ZOOM);
         }
@@ -62,7 +69,7 @@ function FilteredStoresFocuser({
       }
 
       const bounds = new google.maps.LatLngBounds();
-      stores.forEach((store) => bounds.extend({ lat: store.lat, lng: store.lng }));
+      focusStores.forEach((store) => bounds.extend({ lat: store.lat, lng: store.lng }));
       if (bounds.isEmpty()) return;
       map.panTo(bounds.getCenter());
       map.fitBounds(bounds, 64);

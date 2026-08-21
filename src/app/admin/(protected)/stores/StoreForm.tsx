@@ -45,9 +45,13 @@ export default function StoreForm({
   const lngRef = useRef<HTMLInputElement>(null);
   const [geocoding, setGeocoding] = useState(false);
   const [geocodeError, setGeocodeError] = useState<string | null>(null);
+  const [prefecture, setPrefecture] = useState(initial?.prefecture ?? "");
+  const isOverseas = prefecture === "海外";
 
   const handleGeocode = async () => {
-    const fullAddress = `${prefectureRef.current?.value ?? ""}${townRef.current?.value ?? ""}${addressRef.current?.value ?? ""}`;
+    // 「海外」は実在の地名ではなくジオコーディングの精度を下げるため、
+    // クエリ文字列には含めない（国名は住所欄に入力されている前提）。
+    const fullAddress = `${isOverseas ? "" : (prefectureRef.current?.value ?? "")}${townRef.current?.value ?? ""}${addressRef.current?.value ?? ""}`;
     if (!fullAddress.trim()) {
       setGeocodeError("先に都道府県・市区町村・住所を入力してください");
       return;
@@ -142,17 +146,18 @@ export default function StoreForm({
             name="prefecture"
             type="text"
             required
-            defaultValue={initial?.prefecture}
+            value={prefecture}
+            onChange={(e) => setPrefecture(e.target.value)}
             className="rounded-lg border border-zinc-300 px-3 py-2"
           />
         </label>
         <label className="flex flex-col gap-1 text-sm">
-          市区町村 <span className="text-red-600">※</span>
+          市区町村 {!isOverseas && <span className="text-red-600">※</span>}
           <input
             ref={townRef}
             name="town"
             type="text"
-            required
+            required={!isOverseas}
             defaultValue={initial?.town}
             className="rounded-lg border border-zinc-300 px-3 py-2"
           />

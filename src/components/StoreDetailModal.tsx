@@ -5,6 +5,7 @@ import Link from "next/link";
 import { ChevronLeft, ChevronRight, Search, Newspaper } from "lucide-react";
 import type { Store } from "@/types/store";
 import type { ArticleSummary } from "@/types/article";
+import { formatFullAddress } from "@/lib/address";
 import IslandBadge from "./IslandBadge";
 import GenreTag from "./GenreTag";
 import PhotoPlaceholder from "./PhotoPlaceholder";
@@ -27,7 +28,7 @@ export default function StoreDetailModal({
   const photos = store.photos.slice(0, maxPhotos);
   const profileLimit = store.isAd ? 1500 : 400;
   const profile = store.profile.slice(0, profileLimit);
-  const fullAddress = `${store.prefecture}${store.town}${store.address}`;
+  const fullAddress = formatFullAddress(store);
   const yukari = store.village.replace(/ゆかり$/, "").trim();
 
   const currentIndex = stores.findIndex((s) => s.id === store.id);

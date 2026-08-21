@@ -12,6 +12,7 @@ import StoreDetailModal from "@/components/StoreDetailModal";
 import SubmitModal from "@/components/SubmitModal";
 import type { Genre, Region, Store, StoreFilters } from "@/types/store";
 import type { ArticleSummary } from "@/types/article";
+import { comparePrefecturesByReading } from "@/lib/prefectures";
 
 const INITIAL_FILTERS: StoreFilters = {
   keyword: "",
@@ -32,6 +33,15 @@ export default function Home() {
   const [detailStore, setDetailStore] = useState<Store | null>(null);
   const [submitOpen, setSubmitOpen] = useState(false);
   const [filtersOpen, setFiltersOpen] = useState(false);
+  // 初回表示（現在地centeringを尊重したい）と、ユーザーが一度でも
+  // 絞り込み条件を操作した後（「すべて」に戻した場合も含む）とで、
+  // 地図の自動フォーカス挙動を区別するためのフラグ。
+  const [filtersTouched, setFiltersTouched] = useState(false);
+
+  const handleFiltersChange = (next: StoreFilters) => {
+    setFiltersTouched(true);
+    setFilters(next);
+  };
 
   const selectStore = (id: string | null) => {
     setSelectedStoreId(id);
@@ -128,7 +138,14 @@ export default function Home() {
     }
     return Array.from(counts.entries())
       .map(([prefecture, count]) => ({ prefecture, count }))
-      .sort((a, b) => a.prefecture.localeCompare(b.prefecture, "ja"));
+      .sort((a, b) => {
+        // 「海外」は件数に関わらず常に一番下。
+        if (a.prefecture === "海外") return 1;
+        if (b.prefecture === "海外") return -1;
+        // それ以外は店舗数の多い順、同数なら都道府県名のあいうえお順。
+        if (b.count !== a.count) return b.count - a.count;
+        return comparePrefecturesByReading(a.prefecture, b.prefecture);
+      });
   }, [storesMatchingNonPrefectureFilters]);
 
   // 絞り込み条件の変更でその都道府県の該当件数が0件になった場合は、
@@ -156,7 +173,10 @@ export default function Home() {
   // 大きく縮んでいるため、その間はfitBounds等のフォーカス処理を
   // 実行しない（誤ったズームになるのを防ぐ）。パネルを閉じた瞬間に
   // 改めてフォーカスさせる。
-  const shouldFocusMap = hasActiveFilter && !filtersOpen;
+  // filtersTouchedも条件に含めることで、「都道府県：すべて」に戻すなど
+  // 絞り込みをすべて解除した操作の直後も、現在地centeringのままにせず
+  // 表示中の店舗（＝全国）に合わせて地図を再フォーカスさせる。
+  const shouldFocusMap = (hasActiveFilter || filtersTouched) && !filtersOpen;
 
   return (
     <div className="flex h-dvh flex-col">
@@ -167,7 +187,7 @@ export default function Home() {
         genres={genres}
         regions={regions}
         prefectureOptions={prefectureOptions}
-        onChange={setFilters}
+        onChange={handleFiltersChange}
         view={activePanel}
         onChangeView={setActivePanel}
         shownCount={filteredStores.length}

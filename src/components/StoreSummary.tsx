@@ -1,5 +1,6 @@
 import Image from "next/image";
 import type { Store } from "@/types/store";
+import { formatFullAddress } from "@/lib/address";
 import IslandBadge from "./IslandBadge";
 import GenreTag from "./GenreTag";
 import PhotoPlaceholder from "./PhotoPlaceholder";
@@ -34,11 +35,7 @@ export default function StoreSummary({ store }: { store: Store }) {
         <p className="mt-1 truncate text-lg font-bold text-zinc-900">
           {store.name}
         </p>
-        <p className="truncate text-sm text-zinc-500">
-          {store.prefecture}
-          {store.town}
-          {store.address}
-        </p>
+        <p className="truncate text-sm text-zinc-500">{formatFullAddress(store)}</p>
       </div>
     </div>
   );
