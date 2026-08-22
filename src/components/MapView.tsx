@@ -113,27 +113,85 @@ function MapLegend({ regions }: { regions: Region[] }) {
 // 写真サムネイルをピンの上に重ねて表示したいため、ライブラリの<Pin>
 // （内部でDOMに直接アタッチする特殊な仕組みのため、カスタムのラッパー要素の
 // 子として使うと正しく表示されない）は使わず、同等の見た目をSVGで自作する。
+// ピンの先端が正確な位置を指す形状はそのまま残しつつ、ピン内の白い円
+// （グリフ部分）を、その島のデフォルメしたシルエットに差し替える。
+// 対応する島の画像がないregion（全般・未確認）は白い円のまま。
+const ISLAND_SHAPE_KEYS = new Set([
+  "amami",
+  "kikai",
+  "kakeroma",
+  "yoro",
+  "uke",
+  "tokunoshima",
+  "okinoerabu",
+  "yoron",
+]);
+
+// ピン内グリフ（circle cx=13.5 cy=13.5, viewBox 0 0 27 37）の中心位置を
+// %で表したもの。
+const GLYPH_LEFT_PERCENT = (13.5 / 27) * 100;
+const GLYPH_TOP_PERCENT = (13.5 / 37) * 100;
+const GLYPH_RADIUS = 8.6;
+// 島のシルエットは白い円いっぱいに広げず、余白ができるよう一回り小さく表示する。
+const ISLAND_FILL_RATIO = 0.66;
+
 function MarkerPinIcon({
   background,
   borderColor,
+  regionKey,
   scale,
 }: {
   background: string;
   borderColor: string;
+  regionKey?: string;
   scale: number;
 }) {
   const width = 27 * scale;
   const height = 37 * scale;
+  const hasIslandShape = Boolean(regionKey && ISLAND_SHAPE_KEYS.has(regionKey));
+  const glyphSize = GLYPH_RADIUS * 2 * ISLAND_FILL_RATIO * scale;
   return (
-    <svg width={width} height={height} viewBox="0 0 27 37" xmlns="http://www.w3.org/2000/svg">
-      <path
-        d="M13.5 0C6.04 0 0 6.04 0 13.5 0 24 13.5 37 13.5 37S27 24 27 13.5C27 6.04 20.96 0 13.5 0z"
-        fill={background}
-        stroke={borderColor}
-        strokeWidth={1.5}
-      />
-      <circle cx="13.5" cy="13.5" r="5.5" fill="#ffffff" />
-    </svg>
+    <div style={{ position: "relative", width, height }}>
+      <svg
+        width={width}
+        height={height}
+        viewBox="0 0 27 37"
+        xmlns="http://www.w3.org/2000/svg"
+        style={{ position: "absolute", inset: 0 }}
+      >
+        <path
+          d="M13.5 0C6.04 0 0 6.04 0 13.5 0 24 13.5 37 13.5 37S27 24 27 13.5C27 6.04 20.96 0 13.5 0z"
+          fill={background}
+          stroke={borderColor}
+          strokeWidth={1.5}
+        />
+        <circle cx="13.5" cy="13.5" r={GLYPH_RADIUS} fill="#ffffff" />
+      </svg>
+      {hasIslandShape && (
+        <div
+          style={{
+            position: "absolute",
+            left: `${GLYPH_LEFT_PERCENT}%`,
+            top: `${GLYPH_TOP_PERCENT}%`,
+            transform: "translate(-50%, -50%)",
+            width: glyphSize,
+            height: glyphSize,
+            backgroundColor: borderColor,
+            WebkitMaskImage: `url(/islands/${regionKey}.png)`,
+            maskImage: `url(/islands/${regionKey}.png)`,
+            WebkitMaskSize: "contain",
+            maskSize: "contain",
+            WebkitMaskRepeat: "no-repeat",
+            maskRepeat: "no-repeat",
+            WebkitMaskPosition: "center",
+            maskPosition: "center",
+            // 島の輪郭の細かいギザギザを和らげ、より「デフォルメ」した
+            // シルエットに見えるよう軽くぼかす。
+            filter: `blur(${0.45 * scale}px)`,
+          }}
+        />
+      )}
+    </div>
   );
 }
 
@@ -260,6 +318,7 @@ export default function MapView({
                   <MarkerPinIcon
                     background={store.region.color}
                     borderColor={store.region.colorBorder}
+                    regionKey={store.region.key}
                     scale={scale}
                   />
                 )}
