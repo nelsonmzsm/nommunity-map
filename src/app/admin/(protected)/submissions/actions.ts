@@ -10,9 +10,20 @@ export async function approveSubmission(id: string) {
   const user = await requireAdmin();
   const supabase = createAdminClient();
 
-  // 住所は信頼できる情報源なので、承認時は必ず住所からジオコーディングして
-  // 緯度経度を上書きする（投稿フォームでは緯度経度を直接入力させていないため）。
-  if (isGeocodingConfigured()) {
+  // 新規店舗の承認時のみ、住所から自動でジオコーディングして緯度経度を
+  // 設定する（投稿フォームでは緯度経度を直接入力させていないため）。
+  // 既存店舗への「修正」提案では、住所に関係ない項目だけの修正でも
+  // ジオコーディングの結果が微妙にずれて地図上のピン位置が意図せず
+  // 動いてしまうことがあるため、自動では上書きしない
+  // （住所自体を直したい場合は承認後に編集画面から手動で取得する）。
+  const { data: submissionMeta } = await supabase
+    .from("store_submissions")
+    .select("target_store_id")
+    .eq("id", id)
+    .single();
+  const isNewStore = !submissionMeta?.target_store_id;
+
+  if (isNewStore && isGeocodingConfigured()) {
     const { data: submission } = await supabase
       .from("store_submissions")
       .select("prefecture, town, address")

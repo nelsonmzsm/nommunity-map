@@ -24,12 +24,20 @@ export default async function AdminStoresPage({
     <div className="flex flex-col gap-4">
       <div className="flex items-center justify-between">
         <h1 className="text-lg font-bold text-zinc-900">店舗一覧</h1>
-        <Link
-          href="/admin/stores/new"
-          className="rounded-lg bg-zinc-900 px-4 py-2 text-sm font-semibold text-white hover:bg-zinc-700"
-        >
-          新規追加
-        </Link>
+        <div className="flex gap-2">
+          <Link
+            href="/admin/stores/bulk"
+            className="rounded-lg border border-zinc-300 px-4 py-2 text-sm font-semibold text-zinc-600 hover:bg-zinc-50"
+          >
+            一括登録
+          </Link>
+          <Link
+            href="/admin/stores/new"
+            className="rounded-lg bg-zinc-900 px-4 py-2 text-sm font-semibold text-white hover:bg-zinc-700"
+          >
+            新規追加
+          </Link>
+        </div>
       </div>
 
       <div className="flex gap-2 text-xs">
