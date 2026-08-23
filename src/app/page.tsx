@@ -37,10 +37,19 @@ export default function Home() {
   // 絞り込み条件を操作した後（「すべて」に戻した場合も含む）とで、
   // 地図の自動フォーカス挙動を区別するためのフラグ。
   const [filtersTouched, setFiltersTouched] = useState(false);
+  // 「都道府県：海外も含むすべて」が選ばれている間だけ、地図の自動フォーカス
+  // 範囲に海外の店舗も含める（通常は太平洋側まで大きく引いてしまうのを
+  // 避けるため除外している）。
+  const [includeOverseasFocus, setIncludeOverseasFocus] = useState(false);
 
   const handleFiltersChange = (next: StoreFilters) => {
     setFiltersTouched(true);
     setFilters(next);
+  };
+
+  const handleIncludeOverseasFocusChange = (value: boolean) => {
+    setFiltersTouched(true);
+    setIncludeOverseasFocus(value);
   };
 
   const selectStore = (id: string | null) => {
@@ -194,6 +203,8 @@ export default function Home() {
         totalCount={stores.length}
         filtersOpen={filtersOpen}
         onFiltersOpenChange={setFiltersOpen}
+        includeOverseasFocus={includeOverseasFocus}
+        onIncludeOverseasFocusChange={handleIncludeOverseasFocusChange}
       />
 
       <div className="relative flex flex-1 overflow-hidden">
@@ -212,6 +223,7 @@ export default function Home() {
               regions={regions}
               selectedStoreId={selectedStoreId}
               hasActiveFilter={shouldFocusMap}
+              includeOverseasInFocus={includeOverseasFocus}
               onSelectStore={selectStore}
               onOpenDetail={openDetail}
             />

@@ -5,6 +5,8 @@ interface PrefectureOption {
   count: number;
 }
 
+const ALL_WITH_OVERSEAS = "__all_with_overseas__";
+
 interface SearchFiltersProps {
   filters: StoreFilters;
   genres: Genre[];
@@ -17,6 +19,8 @@ interface SearchFiltersProps {
   totalCount: number;
   filtersOpen: boolean;
   onFiltersOpenChange: (open: boolean) => void;
+  includeOverseasFocus: boolean;
+  onIncludeOverseasFocusChange: (value: boolean) => void;
 }
 
 export default function SearchFilters({
@@ -31,6 +35,8 @@ export default function SearchFilters({
   totalCount,
   filtersOpen,
   onFiltersOpenChange,
+  includeOverseasFocus,
+  onIncludeOverseasFocusChange,
 }: SearchFiltersProps) {
   const toggleRegion = (regionId: string) => {
     const regionIds = filters.regionIds.includes(regionId)
@@ -46,13 +52,31 @@ export default function SearchFilters({
     onChange({ ...filters, genreIds });
   };
 
+  // 「都道府県：すべて」を選んだ場合、地図の自動フォーカスは海外の店舗を
+  // 除いた国内の範囲に合わせる（除かないと太平洋を挟んで極端に引いた
+  // 表示になるため）。「海外も含むすべて」を選んだ場合のみ、海外の店舗も
+  // 含めた範囲に地図をフォーカスする。どちらも店舗の絞り込み自体は
+  // prefecture=""（フィルタなし）で同じ。
+  const prefectureSelectValue =
+    includeOverseasFocus && !filters.prefecture ? ALL_WITH_OVERSEAS : filters.prefecture;
+
   const prefectureSelect = (
     <select
-      value={filters.prefecture}
-      onChange={(e) => onChange({ ...filters, prefecture: e.target.value })}
+      value={prefectureSelectValue}
+      onChange={(e) => {
+        const value = e.target.value;
+        if (value === ALL_WITH_OVERSEAS) {
+          onIncludeOverseasFocusChange(true);
+          onChange({ ...filters, prefecture: "" });
+        } else {
+          onIncludeOverseasFocusChange(false);
+          onChange({ ...filters, prefecture: value });
+        }
+      }}
       className="rounded-full border border-zinc-300 bg-white px-4 py-2 text-base font-semibold text-zinc-700"
     >
       <option value="">都道府県: すべて</option>
+      <option value={ALL_WITH_OVERSEAS}>海外も含むすべて</option>
       {prefectureOptions.map(({ prefecture, count }) => (
         <option key={prefecture} value={prefecture}>
           {prefecture}（{count}）

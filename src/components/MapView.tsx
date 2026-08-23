@@ -40,9 +40,11 @@ function SelectedStorePanner({
 function FilteredStoresFocuser({
   active,
   stores,
+  includeOverseas,
 }: {
   active: boolean;
   stores: Store[];
+  includeOverseas: boolean;
 }) {
   const map = useMap();
 
@@ -51,9 +53,12 @@ function FilteredStoresFocuser({
 
     // 「海外」の店舗は地理的に大きく離れているため、自動フォーカス用の
     // 範囲計算に含めると（例:日本全体を見せたいだけなのに）太平洋を
-    // 挟んで極端に引いた表示になってしまう。ズーム計算からは除外し、
-    // 国内の店舗が1件もない場合だけ海外店舗も含めてフォールバックする。
-    const domesticStores = stores.filter((store) => store.prefecture !== "海外");
+    // 挟んで極端に引いた表示になってしまう。includeOverseasがtrueの
+    // （「海外も含むすべて」が選ばれている）ときだけ含め、それ以外は
+    // 除外する（国内の店舗が1件もない場合は海外店舗も含めてフォールバック）。
+    const domesticStores = includeOverseas
+      ? stores
+      : stores.filter((store) => store.prefecture !== "海外");
     const focusStores = domesticStores.length > 0 ? domesticStores : stores;
 
     // 地図コンテナのサイズがレイアウト確定前だと fitBounds が
@@ -76,7 +81,7 @@ function FilteredStoresFocuser({
     });
     return () => cancelAnimationFrame(frame);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [map, active, stores]);
+  }, [map, active, stores, includeOverseas]);
 
   return null;
 }
@@ -200,6 +205,7 @@ interface MapViewProps {
   regions: Region[];
   selectedStoreId: string | null;
   hasActiveFilter: boolean;
+  includeOverseasInFocus?: boolean;
   onSelectStore: (id: string | null) => void;
   onOpenDetail: (store: Store) => void;
 }
@@ -209,6 +215,7 @@ export default function MapView({
   regions,
   selectedStoreId,
   hasActiveFilter,
+  includeOverseasInFocus = false,
   onSelectStore,
   onOpenDetail,
 }: MapViewProps) {
@@ -290,7 +297,11 @@ export default function MapView({
           <SelectedStorePanner
             position={selectedStore ? { lat: selectedStore.lat, lng: selectedStore.lng } : null}
           />
-          <FilteredStoresFocuser active={hasActiveFilter} stores={stores} />
+          <FilteredStoresFocuser
+            active={hasActiveFilter}
+            stores={stores}
+            includeOverseas={includeOverseasInFocus}
+          />
 
           {stores.map((store) => {
             const photo = store.photos[0];
