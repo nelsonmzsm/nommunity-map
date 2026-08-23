@@ -61,26 +61,48 @@ export default function SearchFilters({
     </select>
   );
 
-  const regionButtons = regions.map((region) => {
-    const active = filters.regionIds.includes(region.id);
-    return (
-      <button
-        key={region.id}
-        type="button"
-        onClick={() => toggleRegion(region.id)}
-        className={`shrink-0 whitespace-nowrap rounded-full px-4 py-2 text-base font-semibold transition-shadow ${
-          active ? "ring-2 ring-zinc-900 ring-offset-1" : ""
-        }`}
-        style={{
-          backgroundColor: active ? region.colorBorder : region.color,
-          color: "#ffffff",
-          border: `1.5px solid ${region.colorBorder}`,
-        }}
-      >
-        {region.name}
-      </button>
-    );
-  });
+  const allRegionsActive = filters.regionIds.length === 0;
+  const allRegionsButton = (
+    <button
+      key="all-regions"
+      type="button"
+      onClick={() => onChange({ ...filters, regionIds: [] })}
+      className={`shrink-0 whitespace-nowrap rounded-full px-4 py-2 text-base font-semibold transition-shadow ${
+        allRegionsActive ? "ring-2 ring-zinc-900 ring-offset-1" : ""
+      }`}
+      style={{
+        backgroundColor: allRegionsActive ? "#3f3f46" : "#71717a",
+        color: "#ffffff",
+        border: "1.5px solid #3f3f46",
+      }}
+    >
+      すべて（{totalCount}）
+    </button>
+  );
+
+  const regionButtons = [
+    allRegionsButton,
+    ...regions.map((region) => {
+      const active = filters.regionIds.includes(region.id);
+      return (
+        <button
+          key={region.id}
+          type="button"
+          onClick={() => toggleRegion(region.id)}
+          className={`shrink-0 whitespace-nowrap rounded-full px-4 py-2 text-base font-semibold transition-shadow ${
+            active ? "ring-2 ring-zinc-900 ring-offset-1" : ""
+          }`}
+          style={{
+            backgroundColor: active ? region.colorBorder : region.color,
+            color: "#ffffff",
+            border: `1.5px solid ${region.colorBorder}`,
+          }}
+        >
+          {region.name}
+        </button>
+      );
+    }),
+  ];
 
   return (
     <div className="bg-tsumugi flex flex-col gap-3 border-b border-zinc-200 p-3">
