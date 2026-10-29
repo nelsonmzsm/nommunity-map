@@ -128,6 +128,24 @@ export default function SearchFilters({
     }),
   ];
 
+  const genreButtons = genres.map((genre) => {
+    const active = filters.genreIds.includes(genre.id);
+    return (
+      <button
+        key={genre.id}
+        type="button"
+        onClick={() => toggleGenre(genre.id)}
+        className={`rounded-full border px-4 py-2 text-base font-semibold ${
+          active
+            ? "border-zinc-700 bg-zinc-800 text-white"
+            : "border-zinc-300 bg-white text-zinc-600 hover:bg-zinc-50"
+        }`}
+      >
+        {genre.name}
+      </button>
+    );
+  });
+
   return (
     <div className="bg-tsumugi flex flex-col gap-3 border-b border-zinc-200 p-3">
       <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center sm:gap-2">
@@ -150,6 +168,8 @@ export default function SearchFilters({
 
         <div className="order-4 hidden shrink-0 sm:block">{prefectureSelect}</div>
       </div>
+
+      <div className="hidden flex-wrap gap-2 sm:flex">{genreButtons}</div>
 
       <div className="flex rounded-full border border-zinc-300 bg-zinc-50 p-1 sm:hidden">
         <button
@@ -190,33 +210,37 @@ export default function SearchFilters({
         <span aria-hidden>{filtersOpen ? "▲" : "▼"}</span>
       </button>
 
-      <div
-        className={`${filtersOpen ? "flex" : "hidden"} flex-col gap-3 sm:flex`}
-      >
-        <div className="flex flex-wrap gap-2 sm:hidden">{regionButtons}</div>
-
-        <div className="sm:hidden">{prefectureSelect}</div>
-
-        <div className="flex flex-wrap gap-2">
-          {genres.map((genre) => {
-            const active = filters.genreIds.includes(genre.id);
-            return (
+      {/* スマホ版: 従来はこのパネルがインラインで展開し地図を下へ押しやって
+          いたため、地図の表示領域を圧迫しないよう地図の上に被せる
+          オーバーレイ（ボトムシート）に変更した。 */}
+      {filtersOpen && (
+        <div
+          className="fixed inset-0 z-40 bg-black/40 sm:hidden"
+          onClick={() => onFiltersOpenChange(false)}
+        >
+          <div
+            className="bg-tsumugi absolute inset-x-0 bottom-0 flex max-h-[75vh] flex-col gap-3 overflow-y-auto rounded-t-2xl border-t border-zinc-200 p-4 shadow-xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between">
+              <h2 className="text-base font-bold text-zinc-900">お店を探す</h2>
               <button
-                key={genre.id}
                 type="button"
-                onClick={() => toggleGenre(genre.id)}
-                className={`rounded-full border px-4 py-2 text-base font-semibold ${
-                  active
-                    ? "border-zinc-700 bg-zinc-800 text-white"
-                    : "border-zinc-300 bg-white text-zinc-600 hover:bg-zinc-50"
-                }`}
+                onClick={() => onFiltersOpenChange(false)}
+                className="rounded-full border border-zinc-300 bg-white px-4 py-1.5 text-sm font-semibold text-zinc-700"
               >
-                {genre.name}
+                閉じる
               </button>
-            );
-          })}
+            </div>
+
+            <div className="flex flex-wrap gap-2">{regionButtons}</div>
+
+            <div>{prefectureSelect}</div>
+
+            <div className="flex flex-wrap gap-2">{genreButtons}</div>
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }
