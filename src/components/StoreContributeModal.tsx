@@ -104,6 +104,9 @@ export default function StoreContributeModal({
                   placeholder="このお店の好きなところなど自由にどうぞ"
                   className="rounded-lg border border-zinc-300 bg-white px-3 py-2"
                 />
+                <span className="text-xs text-zinc-400">
+                  ※推しコメントなので、否定的な内容は掲載しません。
+                </span>
               </label>
               <input
                 type="text"
