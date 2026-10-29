@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useState } from "react";
+import { useActionState, useEffect, useRef, useState } from "react";
 import { submitComment, submitPhoto, type CommunitySubmitState } from "@/lib/actions/community";
 
 const INITIAL_STATE: CommunitySubmitState = { status: "idle" };
@@ -20,7 +20,27 @@ export default function StoreContributeModal({
   const [tab, setTab] = useState<"comment" | "photo">("comment");
   const [commentState, commentAction, commentPending] = useActionState(submitComment, INITIAL_STATE);
   const [photoState, photoAction, photoPending] = useActionState(submitPhoto, INITIAL_STATE);
+
+  // 途中でモーダルを閉じても入力内容が消えないよう、フォームの値は
+  // （DOMではなく）このコンポーネント自身のstateで保持する。このコンポーネントは
+  // open=falseの間もアンマウントされず null を返すだけなので、state自体は
+  // 閉じても消えない。店舗を切り替えた場合に別店舗宛ての下書きが残らない
+  // ようにする処理は、呼び出し側で key={storeId} を指定して店舗ごとに
+  // コンポーネントごと作り直すことで担保している。
+  const [commentDisplayName, setCommentDisplayName] = useState("");
+  const [commentText, setCommentText] = useState("");
+  const [photoDisplayName, setPhotoDisplayName] = useState("");
   const [photoFile, setPhotoFile] = useState<File | null>(null);
+  const photoInputRef = useRef<HTMLInputElement>(null);
+
+  // ファイル選択<input>はDOMごと一度消えて作り直されるため、再表示時に
+  // stateに残っている選択済みファイルをDataTransfer経由で入力欄へ戻す。
+  useEffect(() => {
+    if (!open || tab !== "photo" || !photoInputRef.current) return;
+    const dataTransfer = new DataTransfer();
+    if (photoFile) dataTransfer.items.add(photoFile);
+    photoInputRef.current.files = dataTransfer.files;
+  }, [open, tab, photoFile]);
 
   if (!open) return null;
 
@@ -91,6 +111,8 @@ export default function StoreContributeModal({
                   name="displayName"
                   type="text"
                   required
+                  value={commentDisplayName}
+                  onChange={(e) => setCommentDisplayName(e.target.value)}
                   className="rounded-lg border border-zinc-300 bg-white px-3 py-2"
                 />
               </label>
@@ -102,10 +124,12 @@ export default function StoreContributeModal({
                   required
                   maxLength={400}
                   placeholder="このお店の好きなところなど自由にどうぞ"
+                  value={commentText}
+                  onChange={(e) => setCommentText(e.target.value)}
                   className="rounded-lg border border-zinc-300 bg-white px-3 py-2"
                 />
                 <span className="text-xs text-zinc-400">
-                  ※推しコメントなので、否定的な内容は掲載しません。
+                  ※推さないコメントは掲載しないことがあります
                 </span>
               </label>
               <input
@@ -141,12 +165,15 @@ export default function StoreContributeModal({
                 name="displayName"
                 type="text"
                 required
+                value={photoDisplayName}
+                onChange={(e) => setPhotoDisplayName(e.target.value)}
                 className="rounded-lg border border-zinc-300 bg-white px-3 py-2"
               />
             </label>
             <label className="flex flex-col gap-1 text-sm">
               写真（1枚、{MAX_PHOTO_MB}MBまで）
               <input
+                ref={photoInputRef}
                 name="photo"
                 type="file"
                 accept="image/*"

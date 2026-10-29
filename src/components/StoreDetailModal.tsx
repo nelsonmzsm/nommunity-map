@@ -284,6 +284,7 @@ export default function StoreDetailModal({
       </div>
 
       <StoreContributeModal
+        key={store.id}
         storeId={store.id}
         storeName={store.name}
         open={contributeOpen}
