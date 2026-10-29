@@ -214,6 +214,27 @@ export default function StoreDetailModal({
               )}
             </div>
 
+            <div className="mt-5">
+              <p className="mb-1.5 text-center text-xs font-bold" style={{ color: "#D53557" }}>
+                お店さがし連携パートナー
+              </p>
+              <a
+                href="https://oshikura.studio.site/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block overflow-hidden rounded-lg"
+              >
+                <Image
+                  src="/banners/oshikura.jpg"
+                  alt="黒糖焼酎 推し蔵アンバサダー"
+                  width={320}
+                  height={100}
+                  className="h-auto w-full"
+                  unoptimized
+                />
+              </a>
+            </div>
+
             <div className="mt-5 rounded-lg border border-zinc-200 bg-zinc-50 p-3 text-xs leading-relaxed text-zinc-500">
               <p>
                 お店の情報は最新でない可能性があります。ご利用の前に、現在も営業中かご確認ください。
