@@ -219,7 +219,7 @@ export default function StoreDetailModal({
                 掲載店のリサーチで連携中！
               </p>
               <a
-                href="https://oshikura.studio.site/"
+                href="https://www.instagram.com/oshikura.amami/"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="block overflow-hidden rounded-lg"
