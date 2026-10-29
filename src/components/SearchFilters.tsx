@@ -215,15 +215,22 @@ export default function SearchFilters({
           オーバーレイ（ボトムシート）に変更した。 */}
       {filtersOpen && (
         <div
-          className="fixed inset-0 z-40 bg-black/40 sm:hidden"
+          className="fixed inset-0 z-40 bg-black/25 sm:hidden"
           onClick={() => onFiltersOpenChange(false)}
         >
+          {/* 上部に地図の一部を見えたままにして、絞り込み中も地図が
+              リアルタイムに更新されているのが分かるようにする。 */}
           <div
-            className="bg-tsumugi absolute inset-x-0 bottom-0 flex max-h-[75vh] flex-col gap-3 overflow-y-auto rounded-t-2xl border-t border-zinc-200 p-4 shadow-xl"
+            className="bg-tsumugi absolute inset-x-0 bottom-0 flex max-h-[62vh] flex-col gap-3 overflow-y-auto rounded-t-2xl border-t border-zinc-200 p-4 shadow-xl"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between">
-              <h2 className="text-base font-bold text-zinc-900">お店を探す</h2>
+              <h2 className="text-base font-bold text-zinc-900">
+                お店を探す
+                <span className="ml-2 text-xs font-semibold text-zinc-500">
+                  {shownCount}/{totalCount}件
+                </span>
+              </h2>
               <button
                 type="button"
                 onClick={() => onFiltersOpenChange(false)}

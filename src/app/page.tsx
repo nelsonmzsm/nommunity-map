@@ -178,14 +178,12 @@ export default function Home() {
     filters.genreIds.length > 0 ||
     effectivePrefecture !== "";
 
-  // モバイルの「お店を探す」パネルが開いている間は地図の表示領域が
-  // 大きく縮んでいるため、その間はfitBounds等のフォーカス処理を
-  // 実行しない（誤ったズームになるのを防ぐ）。パネルを閉じた瞬間に
-  // 改めてフォーカスさせる。
   // filtersTouchedも条件に含めることで、「都道府県：すべて」に戻すなど
   // 絞り込みをすべて解除した操作の直後も、現在地centeringのままにせず
   // 表示中の店舗（＝全国）に合わせて地図を再フォーカスさせる。
-  const shouldFocusMap = (hasActiveFilter || filtersTouched) && !filtersOpen;
+  // パネルは地図を縮めないオーバーレイなので、パネルの開閉状態では
+  // 判定しない（開いたままでも絞り込みに合わせて即座に地図を更新する）。
+  const shouldFocusMap = hasActiveFilter || filtersTouched;
 
   return (
     <div className="flex h-dvh flex-col">
