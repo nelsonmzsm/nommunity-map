@@ -13,6 +13,13 @@ export interface Genre {
   name: string;
 }
 
+export interface StoreComment {
+  id: string;
+  displayName: string;
+  comment: string;
+  createdAt: string;
+}
+
 export interface Store {
   id: string;
   name: string;
@@ -25,6 +32,8 @@ export interface Store {
   lat: number;
   lng: number;
   photos: string[];
+  userPhotos: string[]; // 承認済みのユーザー投稿写真（店舗詳細モーダルの先頭に表示）
+  comments: StoreComment[]; // 承認済みの推しコメント
   profile: string;
   storeUrl?: string;
   phone?: string;

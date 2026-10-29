@@ -97,6 +97,30 @@ type StoreSubmissionRow = {
   admin_note: string | null;
 };
 
+type StoreCommentRow = {
+  id: string;
+  store_id: string;
+  status: "pending" | "approved" | "rejected";
+  display_name: string;
+  comment: string;
+  created_at: string;
+  reviewed_at: string | null;
+  reviewed_by: string | null;
+  admin_note: string | null;
+};
+
+type StorePhotoSubmissionRow = {
+  id: string;
+  store_id: string;
+  status: "pending" | "approved" | "rejected";
+  display_name: string;
+  photo_url: string;
+  created_at: string;
+  reviewed_at: string | null;
+  reviewed_by: string | null;
+  admin_note: string | null;
+};
+
 export type Database = {
   public: {
     Tables: {
@@ -178,6 +202,34 @@ export type Database = {
             columns: ["region_id"];
             isOneToOne: false;
             referencedRelation: "regions";
+            referencedColumns: ["id"];
+          }
+        ];
+      };
+      store_comments: {
+        Row: StoreCommentRow;
+        Insert: Partial<StoreCommentRow>;
+        Update: Partial<StoreCommentRow>;
+        Relationships: [
+          {
+            foreignKeyName: "store_comments_store_id_fkey";
+            columns: ["store_id"];
+            isOneToOne: false;
+            referencedRelation: "stores";
+            referencedColumns: ["id"];
+          }
+        ];
+      };
+      store_photo_submissions: {
+        Row: StorePhotoSubmissionRow;
+        Insert: Partial<StorePhotoSubmissionRow>;
+        Update: Partial<StorePhotoSubmissionRow>;
+        Relationships: [
+          {
+            foreignKeyName: "store_photo_submissions_store_id_fkey";
+            columns: ["store_id"];
+            isOneToOne: false;
+            referencedRelation: "stores";
             referencedColumns: ["id"];
           }
         ];

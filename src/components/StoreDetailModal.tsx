@@ -1,8 +1,9 @@
 "use client";
 
+import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { ChevronLeft, ChevronRight, Search, Newspaper } from "lucide-react";
+import { ChevronLeft, ChevronRight, Search, Newspaper, MessageSquarePlus } from "lucide-react";
 import type { Store } from "@/types/store";
 import type { ArticleSummary } from "@/types/article";
 import { formatFullAddress } from "@/lib/address";
@@ -10,6 +11,7 @@ import IslandBadge from "./IslandBadge";
 import GenreTag from "./GenreTag";
 import PhotoPlaceholder from "./PhotoPlaceholder";
 import VerifiedBadge from "./VerifiedBadge";
+import StoreContributeModal from "./StoreContributeModal";
 
 export default function StoreDetailModal({
   store,
@@ -24,8 +26,10 @@ export default function StoreDetailModal({
   onClose: () => void;
   onNavigate: (store: Store) => void;
 }) {
+  const [contributeOpen, setContributeOpen] = useState(false);
   const maxPhotos = store.isAd ? 20 : 5;
-  const photos = store.photos.slice(0, maxPhotos);
+  // ユーザーが投稿して承認された写真は、店舗の登録写真より先頭に表示する。
+  const photos = [...store.userPhotos, ...store.photos].slice(0, maxPhotos);
   const profileLimit = store.isAd ? 1500 : 400;
   const profile = store.profile.slice(0, profileLimit);
   const fullAddress = formatFullAddress(store);
@@ -181,6 +185,30 @@ export default function StoreDetailModal({
               </div>
             )}
 
+            <div className="mt-5">
+              <h3 className="text-sm font-bold text-zinc-900">推しコメント</h3>
+              {store.comments.length > 0 ? (
+                <ul className="mt-2 flex flex-col gap-2">
+                  {store.comments.map((c) => (
+                    <li key={c.id} className="rounded-lg bg-zinc-100 p-3 text-sm text-zinc-700">
+                      <p className="whitespace-pre-wrap">{c.comment}</p>
+                      <p className="mt-1 text-xs text-zinc-400">{c.displayName}</p>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p className="mt-2 text-sm text-zinc-400">まだ推しコメントはありません。</p>
+              )}
+              <button
+                type="button"
+                onClick={() => setContributeOpen(true)}
+                className="mt-2 flex w-full items-center justify-center gap-1.5 rounded-lg border border-zinc-300 px-4 py-2.5 text-center text-sm font-semibold text-zinc-700 hover:bg-zinc-50"
+              >
+                <MessageSquarePlus className="h-4 w-4" />
+                推しコメント・写真を投稿する
+              </button>
+            </div>
+
             <div className="mt-5 flex flex-col gap-3 sm:flex-row">
               {store.storeUrl && (
                 <a
@@ -254,6 +282,13 @@ export default function StoreDetailModal({
           </div>
         </div>
       </div>
+
+      <StoreContributeModal
+        storeId={store.id}
+        storeName={store.name}
+        open={contributeOpen}
+        onClose={() => setContributeOpen(false)}
+      />
     </div>
   );
 }

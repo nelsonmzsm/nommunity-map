@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
-import type { Store } from "@/types/store";
+import type { Store, StoreComment } from "@/types/store";
 
 export async function GET() {
   const supabase = await createClient();
@@ -11,6 +11,27 @@ export async function GET() {
 
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+
+  // 推しコメント・写真投稿は、承認待ちのマイグレーション未適用環境でも
+  // 地図本体の表示を絶対に壊さないよう、別クエリにして失敗時は空扱いにする。
+  const [commentsRes, photosRes] = await Promise.all([
+    supabase.from("store_comments").select("*").eq("status", "approved"),
+    supabase.from("store_photo_submissions").select("*").eq("status", "approved"),
+  ]);
+
+  const commentsByStore = new Map<string, StoreComment[]>();
+  for (const c of commentsRes.data ?? []) {
+    const list = commentsByStore.get(c.store_id) ?? [];
+    list.push({ id: c.id, displayName: c.display_name, comment: c.comment, createdAt: c.created_at });
+    commentsByStore.set(c.store_id, list);
+  }
+
+  const photosByStore = new Map<string, string[]>();
+  for (const p of photosRes.data ?? []) {
+    const list = photosByStore.get(p.store_id) ?? [];
+    list.push(p.photo_url);
+    photosByStore.set(p.store_id, list);
   }
 
   const stores: Store[] = data.map((s) => ({
@@ -33,6 +54,8 @@ export async function GET() {
     lat: s.lat,
     lng: s.lng,
     photos: s.photos,
+    userPhotos: photosByStore.get(s.id) ?? [],
+    comments: commentsByStore.get(s.id) ?? [],
     profile: s.profile,
     storeUrl: s.store_url ?? undefined,
     phone: s.phone ?? undefined,
