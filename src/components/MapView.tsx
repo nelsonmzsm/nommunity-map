@@ -6,11 +6,9 @@ import {
   Map,
   AdvancedMarker,
   AdvancedMarkerAnchorPoint,
-  InfoWindow,
   useMap,
 } from "@vis.gl/react-google-maps";
 import type { Region, Store } from "@/types/store";
-import StoreBalloon from "./StoreBalloon";
 
 const DEFAULT_CENTER = { lat: 35.3, lng: 137.5 };
 const DEFAULT_ZOOM = 6;
@@ -310,7 +308,7 @@ export default function MapView({
               <AdvancedMarker
                 key={store.id}
                 position={{ lat: store.lat, lng: store.lng }}
-                onClick={() => onSelectStore(store.id)}
+                onClick={() => onOpenDetail(store)}
                 anchorPoint={photo ? AdvancedMarkerAnchorPoint.CENTER : undefined}
               >
                 {photo ? (
@@ -336,16 +334,6 @@ export default function MapView({
               </AdvancedMarker>
             );
           })}
-
-          {selectedStore && (
-            <InfoWindow
-              position={{ lat: selectedStore.lat, lng: selectedStore.lng }}
-              onCloseClick={() => onSelectStore(null)}
-              maxWidth={300}
-            >
-              <StoreBalloon store={selectedStore} onOpenDetail={onOpenDetail} />
-            </InfoWindow>
-          )}
         </Map>
       </APIProvider>
 
