@@ -214,9 +214,9 @@ export default function StoreDetailModal({
               )}
             </div>
 
-            <div className="mt-5">
+            <div className="mt-5 flex flex-col items-center">
               <p className="mb-1.5 text-center text-xs font-bold" style={{ color: "#D53557" }}>
-                お店さがし連携パートナー
+                掲載店のリサーチで連携中！
               </p>
               <a
                 href="https://oshikura.studio.site/"
@@ -229,7 +229,6 @@ export default function StoreDetailModal({
                   alt="黒糖焼酎 推し蔵アンバサダー"
                   width={320}
                   height={100}
-                  className="h-auto w-full"
                   unoptimized
                 />
               </a>
