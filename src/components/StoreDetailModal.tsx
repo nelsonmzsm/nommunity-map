@@ -9,9 +9,7 @@ import type { ArticleSummary } from "@/types/article";
 import { formatFullAddress } from "@/lib/address";
 import IslandBadge from "./IslandBadge";
 import GenreTag from "./GenreTag";
-import PhotoPlaceholder from "./PhotoPlaceholder";
-import PhotoCarousel from "./PhotoCarousel";
-import PhotoThumbnailGrid from "./PhotoThumbnailGrid";
+import StorePhotoGallery from "./StorePhotoGallery";
 import VerifiedBadge from "./VerifiedBadge";
 import StoreContributeModal from "./StoreContributeModal";
 
@@ -101,19 +99,13 @@ export default function StoreDetailModal({
         </div>
 
         <div className="flex-1 overflow-y-auto">
-          {photos.length > 0 ? (
-            <PhotoCarousel key={store.id} photos={photos} altPrefix={store.name} />
-          ) : (
-            <div className="aspect-[3/2] w-full">
-              <PhotoPlaceholder
-                genres={store.genres}
-                region={store.region}
-                iconClassName="h-12 w-12"
-              />
-            </div>
-          )}
-
-          <PhotoThumbnailGrid key={store.id} photos={photos} altPrefix={store.name} />
+          <StorePhotoGallery
+            key={store.id}
+            photos={photos}
+            altPrefix={store.name}
+            genres={store.genres}
+            region={store.region}
+          />
 
           <div className="px-4 pb-4 pt-4">
             <h2 className="text-2xl font-bold text-zinc-900">{store.name}</h2>
@@ -196,7 +188,7 @@ export default function StoreDetailModal({
                               もっと見る
                             </button>
                           )}
-                          <p className="mt-1 text-xs text-zinc-400">{p.displayName}</p>
+                          <p className="mt-1 text-right text-xs text-zinc-400">{p.displayName}</p>
                         </div>
                         {p.photoUrl && (
                           <button
@@ -225,7 +217,8 @@ export default function StoreDetailModal({
               <button
                 type="button"
                 onClick={() => setContributeOpen(true)}
-                className="mt-2 flex w-full items-center justify-center gap-1.5 rounded-lg border border-zinc-300 px-4 py-2.5 text-center text-sm font-semibold text-zinc-700 hover:bg-zinc-50"
+                style={{ backgroundColor: store.region.color }}
+                className="mt-2 flex w-full items-center justify-center gap-1.5 rounded-lg px-4 py-2.5 text-center text-sm font-bold text-white shadow-sm hover:brightness-95"
               >
                 <MessageSquarePlus className="h-4 w-4" />
                 推しコメント・写真を投稿する

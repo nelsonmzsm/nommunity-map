@@ -35,15 +35,18 @@ export async function GET() {
     photoList.push(p.photo_url);
     photosByStore.set(p.store_id, photoList);
 
-    const postList = postsByStore.get(p.store_id) ?? [];
-    postList.push({
-      id: p.id,
-      displayName: p.display_name,
-      comment: p.comment ?? "",
-      photoUrl: p.photo_url,
-      createdAt: p.created_at,
-    });
-    postsByStore.set(p.store_id, postList);
+    // コメントのない写真投稿は推しコメント欄には出さない（写真はカルーセル・サムネ一覧にのみ反映）。
+    if (p.comment) {
+      const postList = postsByStore.get(p.store_id) ?? [];
+      postList.push({
+        id: p.id,
+        displayName: p.display_name,
+        comment: p.comment,
+        photoUrl: p.photo_url,
+        createdAt: p.created_at,
+      });
+      postsByStore.set(p.store_id, postList);
+    }
   }
 
   for (const list of postsByStore.values()) {

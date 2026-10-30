@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import Image from "next/image";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
@@ -10,25 +10,30 @@ const SWIPE_THRESHOLD_PX = 30;
 export default function PhotoCarousel({
   photos,
   altPrefix,
+  index,
+  onChangeIndex,
 }: {
   photos: string[];
   altPrefix: string;
+  index: number;
+  onChangeIndex: (index: number) => void;
 }) {
-  const [index, setIndex] = useState(0);
   const touchStartX = useRef<number | null>(null);
 
+  // indexが変わるたびに5秒後の次送りを予約し直すことで、自動スライドと
+  // 手動操作（矢印・スワイプ・サムネ選択）を同じタイマーで一本化している。
   useEffect(() => {
     if (photos.length <= 1) return;
-    const timer = setInterval(() => {
-      setIndex((i) => (i + 1) % photos.length);
+    const timer = setTimeout(() => {
+      onChangeIndex((index + 1) % photos.length);
     }, SLIDE_INTERVAL_MS);
-    return () => clearInterval(timer);
-  }, [photos.length]);
+    return () => clearTimeout(timer);
+  }, [photos.length, index, onChangeIndex]);
 
   if (photos.length === 0) return null;
 
   const goTo = (next: number) => {
-    setIndex(((next % photos.length) + photos.length) % photos.length);
+    onChangeIndex(((next % photos.length) + photos.length) % photos.length);
   };
 
   return (
