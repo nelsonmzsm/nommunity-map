@@ -11,6 +11,7 @@ import IslandBadge from "./IslandBadge";
 import GenreTag from "./GenreTag";
 import PhotoPlaceholder from "./PhotoPlaceholder";
 import PhotoCarousel from "./PhotoCarousel";
+import PhotoThumbnailGrid from "./PhotoThumbnailGrid";
 import VerifiedBadge from "./VerifiedBadge";
 import StoreContributeModal from "./StoreContributeModal";
 
@@ -112,6 +113,8 @@ export default function StoreDetailModal({
             </div>
           )}
 
+          <PhotoThumbnailGrid key={store.id} photos={photos} altPrefix={store.name} />
+
           <div className="px-4 pb-4 pt-4">
             <h2 className="text-2xl font-bold text-zinc-900">{store.name}</h2>
             <div className="mt-1.5 flex flex-wrap gap-1.5">
@@ -182,6 +185,19 @@ export default function StoreDetailModal({
                         key={p.id}
                         className="flex gap-3 rounded-lg bg-zinc-100 p-3 text-sm text-zinc-700"
                       >
+                        <div className="min-w-0 flex-1">
+                          {preview && <p className="whitespace-pre-wrap">{preview}</p>}
+                          {truncated && (
+                            <button
+                              type="button"
+                              onClick={() => setExpandedPost(p)}
+                              className="mt-1 text-xs font-semibold text-zinc-500 hover:underline"
+                            >
+                              もっと見る
+                            </button>
+                          )}
+                          <p className="mt-1 text-xs text-zinc-400">{p.displayName}</p>
+                        </div>
                         {p.photoUrl && (
                           <button
                             type="button"
@@ -199,19 +215,6 @@ export default function StoreDetailModal({
                             />
                           </button>
                         )}
-                        <div className="min-w-0 flex-1">
-                          {preview && <p className="whitespace-pre-wrap">{preview}</p>}
-                          {truncated && (
-                            <button
-                              type="button"
-                              onClick={() => setExpandedPost(p)}
-                              className="mt-1 text-xs font-semibold text-zinc-500 hover:underline"
-                            >
-                              もっと見る
-                            </button>
-                          )}
-                          <p className="mt-1 text-xs text-zinc-400">{p.displayName}</p>
-                        </div>
                       </li>
                     );
                   })}
