@@ -100,7 +100,7 @@ type StoreSubmissionRow = {
 type StoreCommentRow = {
   id: string;
   store_id: string;
-  status: "pending" | "approved" | "rejected";
+  status: "pending" | "approved" | "rejected" | "hidden";
   display_name: string;
   comment: string;
   created_at: string;
@@ -112,9 +112,10 @@ type StoreCommentRow = {
 type StorePhotoSubmissionRow = {
   id: string;
   store_id: string;
-  status: "pending" | "approved" | "rejected";
+  status: "pending" | "approved" | "rejected" | "hidden";
   display_name: string;
   photo_url: string;
+  comment: string | null;
   created_at: string;
   reviewed_at: string | null;
   reviewed_by: string | null;

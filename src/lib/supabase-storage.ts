@@ -28,3 +28,13 @@ export async function uploadImageToStorage(file: File, folder: string): Promise<
   const { data } = supabase.storage.from(BUCKET).getPublicUrl(path);
   return data.publicUrl;
 }
+
+// 管理画面での投稿削除時に、Storage上の実ファイルもベストエフォートで削除する。
+export async function deleteImageFromStorage(publicUrl: string): Promise<void> {
+  const marker = `/object/public/${BUCKET}/`;
+  const idx = publicUrl.indexOf(marker);
+  if (idx === -1) return;
+  const path = publicUrl.slice(idx + marker.length);
+  const supabase = createAdminClient();
+  await supabase.storage.from(BUCKET).remove([path]);
+}

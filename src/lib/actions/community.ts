@@ -54,6 +54,7 @@ export async function submitComment(
 const photoSchema = z.object({
   storeId: z.string().min(1),
   displayName: z.string().min(1, "お名前を入力してください"),
+  comment: z.string().max(1000, "1000文字以内で入力してください").optional(),
   company: z.string().optional(),
 });
 
@@ -96,11 +97,14 @@ export async function submitPhoto(
     };
   }
 
+  const comment = data.comment?.trim();
+
   const supabase = createAdminClient();
   const { error } = await supabase.from("store_photo_submissions").insert({
     store_id: data.storeId,
     display_name: data.displayName,
     photo_url: photoUrl,
+    comment: comment ? comment : null,
   });
 
   if (error) {

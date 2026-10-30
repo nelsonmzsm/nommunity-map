@@ -23,3 +23,30 @@ export async function rejectComment(id: string) {
     .eq("id", id);
   revalidatePath("/admin/comments");
 }
+
+export async function hideComment(id: string) {
+  const user = await requireAdmin();
+  const supabase = createAdminClient();
+  await supabase
+    .from("store_comments")
+    .update({ status: "hidden", reviewed_at: new Date().toISOString(), reviewed_by: user.id })
+    .eq("id", id);
+  revalidatePath("/admin/comments");
+}
+
+export async function restoreComment(id: string) {
+  const user = await requireAdmin();
+  const supabase = createAdminClient();
+  await supabase
+    .from("store_comments")
+    .update({ status: "approved", reviewed_at: new Date().toISOString(), reviewed_by: user.id })
+    .eq("id", id);
+  revalidatePath("/admin/comments");
+}
+
+export async function deleteComment(id: string) {
+  await requireAdmin();
+  const supabase = createAdminClient();
+  await supabase.from("store_comments").delete().eq("id", id);
+  revalidatePath("/admin/comments");
+}

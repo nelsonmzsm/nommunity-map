@@ -13,10 +13,11 @@ export interface Genre {
   name: string;
 }
 
-export interface StoreComment {
+export interface StorePost {
   id: string;
   displayName: string;
-  comment: string;
+  comment: string; // 写真投稿でコメントが未入力の場合は空文字
+  photoUrl?: string; // 写真投稿の場合のみ
   createdAt: string;
 }
 
@@ -33,7 +34,7 @@ export interface Store {
   lng: number;
   photos: string[];
   userPhotos: string[]; // 承認済みのユーザー投稿写真（店舗詳細モーダルの先頭に表示）
-  comments: StoreComment[]; // 承認済みの推しコメント
+  posts: StorePost[]; // 承認済みの推しコメント・写真投稿（新しい順）
   profile: string;
   storeUrl?: string;
   phone?: string;

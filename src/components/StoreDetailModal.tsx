@@ -4,14 +4,17 @@ import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { ChevronLeft, ChevronRight, Search, Newspaper, MessageSquarePlus } from "lucide-react";
-import type { Store } from "@/types/store";
+import type { Store, StorePost } from "@/types/store";
 import type { ArticleSummary } from "@/types/article";
 import { formatFullAddress } from "@/lib/address";
 import IslandBadge from "./IslandBadge";
 import GenreTag from "./GenreTag";
 import PhotoPlaceholder from "./PhotoPlaceholder";
+import PhotoCarousel from "./PhotoCarousel";
 import VerifiedBadge from "./VerifiedBadge";
 import StoreContributeModal from "./StoreContributeModal";
+
+const POST_PREVIEW_LENGTH = 200;
 
 export default function StoreDetailModal({
   store,
@@ -27,6 +30,7 @@ export default function StoreDetailModal({
   onNavigate: (store: Store) => void;
 }) {
   const [contributeOpen, setContributeOpen] = useState(false);
+  const [expandedPost, setExpandedPost] = useState<StorePost | null>(null);
   const maxPhotos = store.isAd ? 20 : 5;
   // ユーザーが投稿して承認された写真は、店舗の登録写真より先頭に表示する。
   const photos = [...store.userPhotos, ...store.photos].slice(0, maxPhotos);
@@ -97,28 +101,7 @@ export default function StoreDetailModal({
 
         <div className="flex-1 overflow-y-auto">
           {photos.length > 0 ? (
-            <div className="flex snap-x snap-mandatory overflow-x-auto">
-              {photos.map((photo, i) => (
-                <div
-                  key={i}
-                  className="relative aspect-[3/2] w-full shrink-0 snap-center bg-zinc-100"
-                >
-                  <Image
-                    src={photo}
-                    alt={`${store.name} 写真${i + 1}`}
-                    fill
-                    sizes="(max-width: 512px) 100vw, 512px"
-                    className="object-cover"
-                    unoptimized
-                  />
-                  {photos.length > 1 && (
-                    <div className="absolute bottom-2 right-2 rounded-full bg-black/50 px-2 py-0.5 text-xs font-semibold text-white">
-                      {i + 1}/{photos.length}
-                    </div>
-                  )}
-                </div>
-              ))}
-            </div>
+            <PhotoCarousel key={store.id} photos={photos} altPrefix={store.name} />
           ) : (
             <div className="aspect-[3/2] w-full">
               <PhotoPlaceholder
@@ -187,14 +170,51 @@ export default function StoreDetailModal({
 
             <div className="mt-5">
               <h3 className="text-sm font-bold text-zinc-900">推しコメント</h3>
-              {store.comments.length > 0 ? (
+              {store.posts.length > 0 ? (
                 <ul className="mt-2 flex flex-col gap-2">
-                  {store.comments.map((c) => (
-                    <li key={c.id} className="rounded-lg bg-zinc-100 p-3 text-sm text-zinc-700">
-                      <p className="whitespace-pre-wrap">{c.comment}</p>
-                      <p className="mt-1 text-xs text-zinc-400">{c.displayName}</p>
-                    </li>
-                  ))}
+                  {store.posts.map((p) => {
+                    const truncated = p.comment.length > POST_PREVIEW_LENGTH;
+                    const preview = truncated
+                      ? `${p.comment.slice(0, POST_PREVIEW_LENGTH)}…`
+                      : p.comment;
+                    return (
+                      <li
+                        key={p.id}
+                        className="flex gap-3 rounded-lg bg-zinc-100 p-3 text-sm text-zinc-700"
+                      >
+                        {p.photoUrl && (
+                          <button
+                            type="button"
+                            onClick={() => setExpandedPost(p)}
+                            aria-label="投稿写真を拡大"
+                            className="relative h-14 w-14 shrink-0 overflow-hidden rounded-md bg-zinc-200"
+                          >
+                            <Image
+                              src={p.photoUrl}
+                              alt=""
+                              fill
+                              sizes="56px"
+                              className="object-cover"
+                              unoptimized
+                            />
+                          </button>
+                        )}
+                        <div className="min-w-0 flex-1">
+                          {preview && <p className="whitespace-pre-wrap">{preview}</p>}
+                          {truncated && (
+                            <button
+                              type="button"
+                              onClick={() => setExpandedPost(p)}
+                              className="mt-1 text-xs font-semibold text-zinc-500 hover:underline"
+                            >
+                              もっと見る
+                            </button>
+                          )}
+                          <p className="mt-1 text-xs text-zinc-400">{p.displayName}</p>
+                        </div>
+                      </li>
+                    );
+                  })}
                 </ul>
               ) : (
                 <p className="mt-2 text-sm text-zinc-400">まだ推しコメントはありません。</p>
@@ -290,6 +310,50 @@ export default function StoreDetailModal({
         open={contributeOpen}
         onClose={() => setContributeOpen(false)}
       />
+
+      {expandedPost && (
+        <div
+          className="fixed inset-0 z-[65] flex items-center justify-center bg-black/60 p-4"
+          onClick={(e) => {
+            e.stopPropagation();
+            setExpandedPost(null);
+          }}
+        >
+          <div
+            className="bg-tsumugi flex max-h-[92vh] w-full max-w-md flex-col overflow-y-auto rounded-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-end p-2">
+              <button
+                type="button"
+                onClick={() => setExpandedPost(null)}
+                aria-label="閉じる"
+                className="flex h-9 w-9 items-center justify-center rounded-full text-xl leading-none text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900"
+              >
+                ✕
+              </button>
+            </div>
+            {expandedPost.photoUrl && (
+              <div className="relative aspect-[4/3] w-full bg-zinc-100">
+                <Image
+                  src={expandedPost.photoUrl}
+                  alt=""
+                  fill
+                  sizes="(max-width: 448px) 100vw, 448px"
+                  className="object-contain"
+                  unoptimized
+                />
+              </div>
+            )}
+            <div className="p-4">
+              <p className="whitespace-pre-wrap text-base leading-relaxed text-zinc-800">
+                {expandedPost.comment}
+              </p>
+              <p className="mt-2 text-xs text-zinc-400">{expandedPost.displayName}</p>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

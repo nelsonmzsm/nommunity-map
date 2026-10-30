@@ -1,12 +1,13 @@
 import Link from "next/link";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { approvePhoto, rejectPhoto } from "./actions";
+import { approvePhoto, rejectPhoto, hidePhoto, restorePhoto, deletePhoto } from "./actions";
 
-type StatusFilter = "pending" | "approved" | "rejected" | "all";
+type StatusFilter = "pending" | "approved" | "rejected" | "hidden" | "all";
 
 const STATUS_TABS: { value: StatusFilter; label: string }[] = [
   { value: "pending", label: "未承認" },
   { value: "approved", label: "承認済み" },
+  { value: "hidden", label: "非表示" },
   { value: "rejected", label: "却下" },
   { value: "all", label: "すべて" },
 ];
@@ -15,6 +16,7 @@ const STATUS_LABEL: Record<string, string> = {
   pending: "未承認",
   approved: "承認済み",
   rejected: "却下",
+  hidden: "非表示",
 };
 
 export default async function AdminPhotosPage({
@@ -24,7 +26,10 @@ export default async function AdminPhotosPage({
 }) {
   const { status: rawStatus } = await searchParams;
   const status: StatusFilter =
-    rawStatus === "approved" || rawStatus === "rejected" || rawStatus === "all"
+    rawStatus === "approved" ||
+    rawStatus === "rejected" ||
+    rawStatus === "hidden" ||
+    rawStatus === "all"
       ? rawStatus
       : "pending";
 
@@ -82,6 +87,9 @@ export default async function AdminPhotosPage({
                 {STATUS_LABEL[p.status] ?? p.status}
               </span>
             </div>
+            {p.comment && (
+              <p className="whitespace-pre-wrap text-zinc-700">{p.comment}</p>
+            )}
             <p className="text-xs text-zinc-500">
               投稿者: {p.display_name} ／ {new Date(p.created_at).toLocaleString("ja-JP")}
             </p>
@@ -101,6 +109,58 @@ export default async function AdminPhotosPage({
                     className="rounded-lg border border-zinc-300 px-3 py-1.5 text-xs font-semibold text-zinc-700 hover:bg-zinc-50"
                   >
                     却下する
+                  </button>
+                </form>
+              </div>
+            )}
+            {p.status === "approved" && (
+              <div className="flex gap-2">
+                <form action={hidePhoto.bind(null, p.id)}>
+                  <button
+                    type="submit"
+                    className="rounded-lg border border-zinc-300 px-3 py-1.5 text-xs font-semibold text-zinc-700 hover:bg-zinc-50"
+                  >
+                    非表示にする
+                  </button>
+                </form>
+                <form action={deletePhoto.bind(null, p.id)}>
+                  <button
+                    type="submit"
+                    className="rounded-lg border border-red-300 px-3 py-1.5 text-xs font-semibold text-red-600 hover:bg-red-50"
+                  >
+                    削除する
+                  </button>
+                </form>
+              </div>
+            )}
+            {p.status === "hidden" && (
+              <div className="flex gap-2">
+                <form action={restorePhoto.bind(null, p.id)}>
+                  <button
+                    type="submit"
+                    className="rounded-lg bg-zinc-900 px-3 py-1.5 text-xs font-semibold text-white hover:bg-zinc-700"
+                  >
+                    再承認する
+                  </button>
+                </form>
+                <form action={deletePhoto.bind(null, p.id)}>
+                  <button
+                    type="submit"
+                    className="rounded-lg border border-red-300 px-3 py-1.5 text-xs font-semibold text-red-600 hover:bg-red-50"
+                  >
+                    削除する
+                  </button>
+                </form>
+              </div>
+            )}
+            {p.status === "rejected" && (
+              <div className="flex gap-2">
+                <form action={deletePhoto.bind(null, p.id)}>
+                  <button
+                    type="submit"
+                    className="rounded-lg border border-red-300 px-3 py-1.5 text-xs font-semibold text-red-600 hover:bg-red-50"
+                  >
+                    削除する
                   </button>
                 </form>
               </div>

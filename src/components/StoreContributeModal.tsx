@@ -30,6 +30,7 @@ export default function StoreContributeModal({
   const [commentDisplayName, setCommentDisplayName] = useState("");
   const [commentText, setCommentText] = useState("");
   const [photoDisplayName, setPhotoDisplayName] = useState("");
+  const [photoComment, setPhotoComment] = useState("");
   const [photoFile, setPhotoFile] = useState<File | null>(null);
   const photoInputRef = useRef<HTMLInputElement>(null);
 
@@ -182,6 +183,21 @@ export default function StoreContributeModal({
                 className="rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm file:mr-3 file:rounded-md file:border-0 file:bg-zinc-100 file:px-3 file:py-1.5"
               />
               {photoFile && <span className="text-xs text-zinc-500">{photoFile.name}</span>}
+            </label>
+            <label className="flex flex-col gap-1 text-sm">
+              コメント（任意）
+              <textarea
+                name="comment"
+                rows={3}
+                maxLength={1000}
+                placeholder="写真についてひとことどうぞ（任意）"
+                value={photoComment}
+                onChange={(e) => setPhotoComment(e.target.value)}
+                className="rounded-lg border border-zinc-300 bg-white px-3 py-2"
+              />
+              <span className="text-xs text-zinc-400">
+                ※推さないコメントは掲載しないことがあります
+              </span>
             </label>
             <input
               type="text"

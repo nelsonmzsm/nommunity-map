@@ -1,12 +1,13 @@
 import Link from "next/link";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { approveComment, rejectComment } from "./actions";
+import { approveComment, rejectComment, hideComment, restoreComment, deleteComment } from "./actions";
 
-type StatusFilter = "pending" | "approved" | "rejected" | "all";
+type StatusFilter = "pending" | "approved" | "rejected" | "hidden" | "all";
 
 const STATUS_TABS: { value: StatusFilter; label: string }[] = [
   { value: "pending", label: "未承認" },
   { value: "approved", label: "承認済み" },
+  { value: "hidden", label: "非表示" },
   { value: "rejected", label: "却下" },
   { value: "all", label: "すべて" },
 ];
@@ -15,6 +16,7 @@ const STATUS_LABEL: Record<string, string> = {
   pending: "未承認",
   approved: "承認済み",
   rejected: "却下",
+  hidden: "非表示",
 };
 
 export default async function AdminCommentsPage({
@@ -24,7 +26,10 @@ export default async function AdminCommentsPage({
 }) {
   const { status: rawStatus } = await searchParams;
   const status: StatusFilter =
-    rawStatus === "approved" || rawStatus === "rejected" || rawStatus === "all"
+    rawStatus === "approved" ||
+    rawStatus === "rejected" ||
+    rawStatus === "hidden" ||
+    rawStatus === "all"
       ? rawStatus
       : "pending";
 
@@ -96,6 +101,58 @@ export default async function AdminCommentsPage({
                     className="rounded-lg border border-zinc-300 px-3 py-1.5 text-xs font-semibold text-zinc-700 hover:bg-zinc-50"
                   >
                     却下する
+                  </button>
+                </form>
+              </div>
+            )}
+            {c.status === "approved" && (
+              <div className="mt-2 flex gap-2">
+                <form action={hideComment.bind(null, c.id)}>
+                  <button
+                    type="submit"
+                    className="rounded-lg border border-zinc-300 px-3 py-1.5 text-xs font-semibold text-zinc-700 hover:bg-zinc-50"
+                  >
+                    非表示にする
+                  </button>
+                </form>
+                <form action={deleteComment.bind(null, c.id)}>
+                  <button
+                    type="submit"
+                    className="rounded-lg border border-red-300 px-3 py-1.5 text-xs font-semibold text-red-600 hover:bg-red-50"
+                  >
+                    削除する
+                  </button>
+                </form>
+              </div>
+            )}
+            {c.status === "hidden" && (
+              <div className="mt-2 flex gap-2">
+                <form action={restoreComment.bind(null, c.id)}>
+                  <button
+                    type="submit"
+                    className="rounded-lg bg-zinc-900 px-3 py-1.5 text-xs font-semibold text-white hover:bg-zinc-700"
+                  >
+                    再承認する
+                  </button>
+                </form>
+                <form action={deleteComment.bind(null, c.id)}>
+                  <button
+                    type="submit"
+                    className="rounded-lg border border-red-300 px-3 py-1.5 text-xs font-semibold text-red-600 hover:bg-red-50"
+                  >
+                    削除する
+                  </button>
+                </form>
+              </div>
+            )}
+            {c.status === "rejected" && (
+              <div className="mt-2 flex gap-2">
+                <form action={deleteComment.bind(null, c.id)}>
+                  <button
+                    type="submit"
+                    className="rounded-lg border border-red-300 px-3 py-1.5 text-xs font-semibold text-red-600 hover:bg-red-50"
+                  >
+                    削除する
                   </button>
                 </form>
               </div>
