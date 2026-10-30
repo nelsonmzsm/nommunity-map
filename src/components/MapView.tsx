@@ -16,6 +16,17 @@ const GEOLOCATION_ZOOM = 12;
 const GEOLOCATION_TIMEOUT_MS = 5000;
 const SELECTED_STORE_PAN_ZOOM = 14;
 
+// 地図を開き直すたびや再レンダリングのたびに画像がちらつかないよう、
+// Math.randomではなく店舗IDから決まる疑似ランダムで1枚選ぶ（同じ店舗なら常に同じ写真になる）。
+function pickStablePhoto(photos: string[], seed: string): string | undefined {
+  if (photos.length === 0) return undefined;
+  let hash = 0;
+  for (let i = 0; i < seed.length; i++) {
+    hash = (hash * 31 + seed.charCodeAt(i)) >>> 0;
+  }
+  return photos[hash % photos.length];
+}
+
 function SelectedStorePanner({
   position,
 }: {
@@ -302,7 +313,8 @@ export default function MapView({
           />
 
           {stores.map((store) => {
-            const photo = store.photos[0];
+            const photo =
+              pickStablePhoto(store.userPhotos, store.id) ?? store.photos[0];
             const scale = store.id === selectedStoreId ? 1.9 : 1.5;
             return (
               <AdvancedMarker

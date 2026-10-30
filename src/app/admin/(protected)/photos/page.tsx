@@ -1,6 +1,13 @@
 import Link from "next/link";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { approvePhoto, rejectPhoto, hidePhoto, restorePhoto, deletePhoto } from "./actions";
+import {
+  approvePhoto,
+  rejectPhoto,
+  hidePhoto,
+  restorePhoto,
+  deletePhoto,
+  updatePhotoComment,
+} from "./actions";
 
 type StatusFilter = "pending" | "approved" | "rejected" | "hidden" | "all";
 
@@ -93,6 +100,27 @@ export default async function AdminPhotosPage({
             <p className="text-xs text-zinc-500">
               投稿者: {p.display_name} ／ {new Date(p.created_at).toLocaleString("ja-JP")}
             </p>
+            <details>
+              <summary className="cursor-pointer text-xs font-semibold text-zinc-500 hover:underline">
+                編集する
+              </summary>
+              <form action={updatePhotoComment.bind(null, p.id)} className="mt-2 flex flex-col gap-2">
+                <textarea
+                  name="comment"
+                  defaultValue={p.comment ?? ""}
+                  rows={3}
+                  maxLength={1000}
+                  placeholder="コメントなし"
+                  className="rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm"
+                />
+                <button
+                  type="submit"
+                  className="self-start rounded-lg bg-zinc-900 px-3 py-1.5 text-xs font-semibold text-white hover:bg-zinc-700"
+                >
+                  保存する
+                </button>
+              </form>
+            </details>
             {p.status === "pending" && (
               <div className="flex gap-2">
                 <form action={approvePhoto.bind(null, p.id)}>

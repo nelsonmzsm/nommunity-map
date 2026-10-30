@@ -45,6 +45,18 @@ export async function restorePhoto(id: string) {
   revalidatePath("/admin/photos");
 }
 
+export async function updatePhotoComment(id: string, formData: FormData) {
+  await requireAdmin();
+  const raw = (formData.get("comment") as string | null) ?? "";
+  const comment = raw.trim();
+  const supabase = createAdminClient();
+  await supabase
+    .from("store_photo_submissions")
+    .update({ comment: comment ? comment : null })
+    .eq("id", id);
+  revalidatePath("/admin/photos");
+}
+
 export async function deletePhoto(id: string) {
   await requireAdmin();
   const supabase = createAdminClient();

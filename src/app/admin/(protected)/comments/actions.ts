@@ -44,6 +44,15 @@ export async function restoreComment(id: string) {
   revalidatePath("/admin/comments");
 }
 
+export async function updateComment(id: string, formData: FormData) {
+  await requireAdmin();
+  const comment = (formData.get("comment") as string | null)?.trim();
+  if (!comment) return;
+  const supabase = createAdminClient();
+  await supabase.from("store_comments").update({ comment }).eq("id", id);
+  revalidatePath("/admin/comments");
+}
+
 export async function deleteComment(id: string) {
   await requireAdmin();
   const supabase = createAdminClient();

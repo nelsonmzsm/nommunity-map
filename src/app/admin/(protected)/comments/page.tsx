@@ -1,6 +1,13 @@
 import Link from "next/link";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { approveComment, rejectComment, hideComment, restoreComment, deleteComment } from "./actions";
+import {
+  approveComment,
+  rejectComment,
+  hideComment,
+  restoreComment,
+  deleteComment,
+  updateComment,
+} from "./actions";
 
 type StatusFilter = "pending" | "approved" | "rejected" | "hidden" | "all";
 
@@ -85,6 +92,26 @@ export default async function AdminCommentsPage({
             <p className="mt-1 text-xs text-zinc-500">
               投稿者: {c.display_name} ／ {new Date(c.created_at).toLocaleString("ja-JP")}
             </p>
+            <details className="mt-2">
+              <summary className="cursor-pointer text-xs font-semibold text-zinc-500 hover:underline">
+                編集する
+              </summary>
+              <form action={updateComment.bind(null, c.id)} className="mt-2 flex flex-col gap-2">
+                <textarea
+                  name="comment"
+                  defaultValue={c.comment}
+                  rows={3}
+                  maxLength={400}
+                  className="rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm"
+                />
+                <button
+                  type="submit"
+                  className="self-start rounded-lg bg-zinc-900 px-3 py-1.5 text-xs font-semibold text-white hover:bg-zinc-700"
+                >
+                  保存する
+                </button>
+              </form>
+            </details>
             {c.status === "pending" && (
               <div className="mt-2 flex gap-2">
                 <form action={approveComment.bind(null, c.id)}>
